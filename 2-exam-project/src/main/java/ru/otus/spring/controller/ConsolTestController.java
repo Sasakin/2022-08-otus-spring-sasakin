@@ -4,9 +4,9 @@ import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import ru.otus.spring.Main;
+import org.springframework.stereotype.Controller;
 import ru.otus.spring.domain.Test;
+import ru.otus.spring.property.ExamProperty;
 import ru.otus.spring.service.CsvTestService;
 
 import java.io.IOException;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@Component
+@Controller
 public class ConsolTestController implements TestController {
 
     private Scanner scanner;
@@ -25,10 +25,13 @@ public class ConsolTestController implements TestController {
 
     private TestResult result;
 
-    public ConsolTestController(@Autowired CsvTestService service) {
+    private ExamProperty property;
+
+    public ConsolTestController(@Autowired CsvTestService service, @Autowired ExamProperty property) {
         this.scanner = new Scanner(System.in);
         this.service = service;
         this.result = new TestResult();
+        this.property = property;
     }
 
     @Override
@@ -41,9 +44,9 @@ public class ConsolTestController implements TestController {
 
     @Override
     public void startTesting() throws IOException, CsvException {
-        InputStream testStream = Main.class.getClassLoader().getResourceAsStream("ru/otus/spring/test.csv");
+        InputStream testStream = ConsolTestController.class.getClassLoader().getResourceAsStream(property.getExamTestSrc());
 
-        AtomicInteger testResult = result.getTestResult();
+        AtomicInteger testResult = result.getCntRightAnswers();
         AtomicInteger questionsCount = result.getQuestionsCount();
 
         try (CSVReader reader = new CSVReader(new InputStreamReader(testStream))) {
@@ -65,9 +68,16 @@ public class ConsolTestController implements TestController {
 
     @Override
     public void finishTesting() {
-        System.out.printf("%s %s your result: %d / %d",
+        int countRightAnswers = result.getCntRightAnswers().get();
+        System.out.printf("%s %s your result: %d / %d\n",
                 result.getName(), result.getSurname(),
-                result.getTestResult().get(), result.getQuestionsCount().get());
+                countRightAnswers, result.getQuestionsCount().get());
+
+        if(countRightAnswers >= property.getCountAnswersForPass()) {
+            System.out.println("Test passed");
+        } else {
+            System.out.println("Test failed");
+        }
     }
 }
 
@@ -75,6 +85,6 @@ public class ConsolTestController implements TestController {
 class TestResult {
     private String name;
     private String surname;
-    private AtomicInteger testResult = new AtomicInteger();
+    private AtomicInteger cntRightAnswers = new AtomicInteger();
     private AtomicInteger questionsCount = new AtomicInteger();
 }
