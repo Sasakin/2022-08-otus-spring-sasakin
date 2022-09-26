@@ -7,9 +7,9 @@ import ru.otus.spring.domain.Test;
 import java.io.IOException;
 import java.util.List;
 
-public interface CsvTestService {
+public interface CsvExamService {
 
-    List<Test> readTests(CSVReader reader) throws IOException, CsvException;
+    List<Test> readTests() throws IOException, CsvException;
 
 }
 

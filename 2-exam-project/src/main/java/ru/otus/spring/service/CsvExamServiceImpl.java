@@ -13,12 +13,14 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class CsvTestServiceImpl implements CsvTestService {
+public class CsvExamServiceImpl implements CsvExamService {
 
-    private StringArrTestConverter converter;
+    private final StringArrTestConverter converter;
+
+    private CSVReader reader;
 
     @Override
-    public List<Test> readTests(CSVReader reader) throws IOException, CsvException {
+    public List<Test> readTests() throws IOException, CsvException {
         List<String[]> r = reader.readAll();
         return r.stream().map(data -> converter.convert(data)).collect(Collectors.toList());
     }

@@ -1,15 +1,12 @@
 package ru.otus.spring;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import ru.otus.spring.controller.TestController;
 
 public class Main {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Throwable {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
-        TestController controller = context.getBean(TestController.class);
-        controller.prepareTest();
-        controller.startTesting();
-        controller.finishTesting();
+        Application application = context.getBean(Application.class);
+        application.run();
     }
 }
