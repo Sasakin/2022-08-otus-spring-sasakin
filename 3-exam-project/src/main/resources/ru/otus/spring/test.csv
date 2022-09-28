@@ -1,0 +1,5 @@
+What can Java be used for?,1 for website development,2 for creating PC programs,3 for application development,4 for all of the above,4
+How to properly declare an array?,1 int a = new int[] {1, 2, 3, 4, 5};,2 int[] a = new int[] {1, 2, 3, 4, 5};,3 int[] a = new int {1, 2, 3, 4, 5};,4 int[] a = int[] {1, 2, 3, 4, 5};,2
+The ternary operator is:,1 &&,2 !,3 ^,4?:,1
+How to declare a class in code?,1 class MyClass {},2 new class MyClass {},3 select * from class MyClass {},4 MyClass extends class {},1
+What is the NEW operator used for?,1 to create a new variable,2 to declare a new class,3 to instantiate a class,4 is the antagonist of the OLD operator,1
