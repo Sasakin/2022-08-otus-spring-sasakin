@@ -4,7 +4,10 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.otus.spring.book.domain.Book;
 import ru.otus.spring.book.domain.Genre;
 
 import java.sql.ResultSet;
@@ -29,28 +32,25 @@ public class GenreDaoJdbc implements GenreDao {
     }
 
     @Override
-    public void insert(Genre genre) {
+    public Long insert(Genre genre) {
         Map<String, Object> params = new HashMap<>();
-        params.put("id", genre.getId());
         params.put("title", genre.getTitle());
         SqlParameterSource paramSource = new MapSqlParameterSource(params);
-        jdbcTemplate.update("insert into genres (id, title) values (:id, :title)", paramSource);
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update("insert into genres (title) values (:title)",
+                paramSource, keyHolder, new String[] { "id" });
+        Long id = keyHolder.getKey().longValue();
+        genre.setId(id);
+        return id;
     }
-
-    /*@Override
-    public Genre getByTitle(String title) {
-        SqlParameterSource param = new MapSqlParameterSource("title", title);
-        Genre genre = jdbcTemplate.queryForObject("select id, title from genres where title = :title",
-                param, new GenreMapper());
-        return genre;
-    }*/
 
     @Override
     public Genre getById(long id) {
         SqlParameterSource param = new MapSqlParameterSource("id", id);
-        Genre genre = jdbcTemplate.queryForObject("select id, title from genres where id = :id",
+        List<Genre> genres = jdbcTemplate.query("select id, title from genres where id = :id",
                 param, new GenreMapper());
-        return genre;
+
+        return genres.stream().findFirst().orElse(null);
     }
 
     @Override

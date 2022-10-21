@@ -4,8 +4,11 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.otus.spring.book.domain.Author;
+import ru.otus.spring.book.domain.Genre;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,28 +32,24 @@ public class AuthorDaoJdbc implements AuthorDao {
     }
 
     @Override
-    public void insert(Author author) {
+    public Long insert(Author author) {
         Map<String, Object> params = new HashMap<>();
-        params.put("id", author.getId());
         params.put("name", author.getName());
         SqlParameterSource paramSource = new MapSqlParameterSource(params);
-        jdbcTemplate.update("insert into authors (id, name) values (:id, :name)", paramSource);
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update("insert into authors (name) values (:name)",
+                paramSource, keyHolder, new String[] { "id" });
+        Long id = keyHolder.getKey().longValue();
+        author.setId(id);
+        return id;
     }
-
-    /*@Override
-    public Author getByName(String name) {
-        SqlParameterSource param = new MapSqlParameterSource("name", name);
-        Author author = jdbcTemplate.queryForObject("select id, name from authors where name = :name",
-                param, new AuthorMapper());
-        return author;
-    }*/
 
     @Override
     public Author getById(long id) {
         SqlParameterSource param = new MapSqlParameterSource("id", id);
-        Author author = jdbcTemplate.queryForObject("select id, name from authors where id = :id",
+        List<Author> authors = jdbcTemplate.query("select id, name from authors where id = :id",
                 param, new AuthorMapper());
-        return author;
+        return authors.stream().findFirst().orElse(null);
     }
 
     @Override

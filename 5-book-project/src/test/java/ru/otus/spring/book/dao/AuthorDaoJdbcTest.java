@@ -1,5 +1,6 @@
 package ru.otus.spring.book.dao;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +53,10 @@ public class AuthorDaoJdbcTest {
     @DisplayName("Добавлять автора в БД")
     @Test
     void shouldInsertAuthor() {
-        Author expectedAuthor = new Author(2l, "Igor");
-        authorDao.insert(expectedAuthor);
-        Author actualAuthor = authorDao.getById(expectedAuthor.getId());
-        assertThat(actualAuthor).usingRecursiveComparison().isEqualTo(expectedAuthor);
+        Author expectedAuthor = new Author("Igor");
+        Long id = authorDao.insert(expectedAuthor);
+        Author actualAuthor = authorDao.getById(id);
+        assertThat(actualAuthor.getName()).isEqualTo("Igor");
     }
 
     @DisplayName("Возвращать ожидаемого автора по его id")
@@ -74,8 +75,7 @@ public class AuthorDaoJdbcTest {
 
         authorDao.deleteById(EXISTING_AUTHOR_ID);
 
-        assertThatThrownBy(() -> authorDao.getById(EXISTING_AUTHOR_ID))
-                .isInstanceOf(EmptyResultDataAccessException.class);
+        Assertions.assertNull(authorDao.getById(EXISTING_AUTHOR_ID));
     }
 
     @DisplayName("Возвращать ожидаемый список авторов")
