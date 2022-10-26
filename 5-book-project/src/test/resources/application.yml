@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/testdb
+    username: postgres
+    password: postgres
+    #initialization-mode: always
+    #schema: schema.sql
+    #data: data.sql
+  sql:
+    init:
+      mode: always
+      data-locations: data.sql
