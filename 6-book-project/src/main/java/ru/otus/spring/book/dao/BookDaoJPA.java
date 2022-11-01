@@ -36,7 +36,7 @@ public class BookDaoJPA implements BookDao {
     @Override
     public List<Book> getAll() {
         EntityGraph graph = entityManager.getEntityGraph("author-genre-graph");
-        Query query = entityManager.createQuery("select b from Book b join fetch b.comments", Book.class); //
+        Query query = entityManager.createQuery("select b from Book b", Book.class); //
         query.setHint(org.springframework.data.jpa.repository.EntityGraph.EntityGraphType.FETCH.getKey(),graph);
         return query.getResultList();
     }

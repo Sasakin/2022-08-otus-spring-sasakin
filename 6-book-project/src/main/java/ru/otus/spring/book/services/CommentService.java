@@ -11,7 +11,5 @@ public interface CommentService {
 
     Comment getById(long id);
 
-    List<Comment> getCommentsByBook(Book book);
-
     void deleteById(long id);
 }

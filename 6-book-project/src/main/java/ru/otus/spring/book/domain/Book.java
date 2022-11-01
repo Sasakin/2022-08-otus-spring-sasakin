@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -55,8 +57,8 @@ public class Book {
     @JoinColumn(name = "genre_id")
     private Genre genre;
 
-    //@Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = Comment.class, mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<Comment> comments = new ArrayList<>();
+    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(targetEntity = Comment.class, mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Comment> comments;// = new ArrayList<>();
 
 }

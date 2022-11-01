@@ -27,11 +27,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<Comment> getCommentsByBook(Book book) {
-        return dao.getCommentsByBook(book);
-    }
-
-    @Override
     public void deleteById(long id) {
         dao.deleteById(id);
     }

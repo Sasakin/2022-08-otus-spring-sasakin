@@ -29,13 +29,6 @@ public class CommentDaoJPA implements CommentDao {
     }
 
     @Override
-    public List<Comment> getCommentsByBook(Book bookId) {
-        return entityManager.createQuery("select c from Comment c where  c.book = ?1", Comment.class)
-                .setParameter(1, bookId)
-                .getResultList();
-    }
-
-    @Override
     public void deleteById(long id) {
         Comment comment = getById(id);
         entityManager.remove(comment);

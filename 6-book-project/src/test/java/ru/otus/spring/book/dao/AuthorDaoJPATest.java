@@ -22,8 +22,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 @Sql("/data.sql")
 public class AuthorDaoJPATest {
 
-    private static final int EXPECTED_AUTHORS_COUNT = 1;
-    private static final long EXISTING_AUTHOR_ID = 1l;
+    private static final String EXISTING_AUTHOR_NAME = "Ivan";
 
     @Autowired
     private AuthorDaoJPA authorDao;
@@ -42,7 +41,7 @@ public class AuthorDaoJPATest {
     @Test
     void shouldReturnExpectedAuthorCount() {
         int actualAuthorsCount = authorDao.getAll().size();
-        assertThat(actualAuthorsCount).isEqualTo(EXPECTED_AUTHORS_COUNT);
+        assertThat(actualAuthorsCount).isGreaterThan(0);
     }
 
 
@@ -58,11 +57,10 @@ public class AuthorDaoJPATest {
     @DisplayName("Удалять заданного автора по его id")
     @Test
     void shouldCorrectDeleteAuthorById() {
-        assertThatCode(() -> authorDao.getById(EXISTING_AUTHOR_ID))
-                .doesNotThrowAnyException();
+        Author author = authorDao.getByName(EXISTING_AUTHOR_NAME);
+        Long id = author.getId();
+        authorDao.deleteById(id);
 
-        authorDao.deleteById(EXISTING_AUTHOR_ID);
-
-        Assertions.assertNull(authorDao.getById(EXISTING_AUTHOR_ID));
+        Assertions.assertNull(authorDao.getById(id));
     }
 }

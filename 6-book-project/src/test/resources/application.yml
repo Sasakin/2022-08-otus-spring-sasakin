@@ -11,7 +11,9 @@ spring:
       schema-locations: schema.sql
   main:
     allow-circular-references: true
-
+  shell:
+    interactive:
+      enabled: false
 
   jpa:
     generate-ddl: true
