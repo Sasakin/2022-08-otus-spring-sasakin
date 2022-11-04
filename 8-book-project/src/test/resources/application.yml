@@ -1,0 +1,14 @@
+spring:
+  data:
+    mongodb:
+      database: testdb
+  main:
+    allow-circular-references: true
+  shell:
+    interactive:
+      enabled: false
+
+
+logging:
+ level:
+   ROOT: ERROR
