@@ -1,6 +1,6 @@
 package ru.otus.spring.book.dao;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import ru.otus.spring.book.domain.Genre;
 
 import javax.persistence.EntityManager;
@@ -8,7 +8,7 @@ import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.util.List;
 
-@Repository
+@Service
 public class GenreDaoJPA implements GenreDao {
 
     @PersistenceContext
@@ -27,8 +27,8 @@ public class GenreDaoJPA implements GenreDao {
     @Override
     public Genre getByTitle(String title) {
         Genre genre = entityManager
-                        .createQuery("select g from Genre g where g.title = ?1", Genre.class)
-                        .setParameter(1, title)
+                        .createQuery("select g from Genre g where g.title = :title", Genre.class)
+                        .setParameter("title", title)
                         .getResultList()
                         .stream()
                         .findFirst()
@@ -48,6 +48,7 @@ public class GenreDaoJPA implements GenreDao {
     }
 
     @Override
+    @Transactional
     public void deleteById(long id) {
         Genre genre = getById(id);
         entityManager.remove(genre);

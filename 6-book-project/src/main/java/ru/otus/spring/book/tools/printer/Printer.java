@@ -1,4 +1,4 @@
-package ru.otus.spring.book.printer;
+package ru.otus.spring.book.tools.printer;
 
 public interface Printer {
 
@@ -8,4 +8,6 @@ public interface Printer {
     void printAuthors();
 
     void printGenres();
+
+    void printCommentsByBookId(Long bookId);
 }

@@ -1,13 +1,14 @@
 package ru.otus.spring.book.dao;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import ru.otus.spring.book.domain.Author;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import java.util.List;
 
-@Repository
+@Service
 public class AuthorDaoJPA implements AuthorDao {
 
     @PersistenceContext
@@ -25,9 +26,9 @@ public class AuthorDaoJPA implements AuthorDao {
     @Override
     public Author getByName(String name) {
         Author author = entityManager
-                .createQuery("select a from Author a where a.name = ?1",
+                .createQuery("select a from Author a where a.name = :name",
                 Author.class)
-                .setParameter(1, name)
+                .setParameter("name", name)
                 .getResultList()
                 .stream().findFirst().orElse(null);;
         return author;
@@ -45,6 +46,7 @@ public class AuthorDaoJPA implements AuthorDao {
     }
 
     @Override
+    @Transactional
     public void deleteById(long id) {
         Author author = getById(id);
         entityManager.remove(author);

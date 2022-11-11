@@ -1,15 +1,14 @@
 package ru.otus.spring.book.dao;
 
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Repository;
-import ru.otus.spring.book.domain.Book;
+import org.springframework.stereotype.Service;
 import ru.otus.spring.book.domain.Comment;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.List;
+import javax.transaction.Transactional;
 
-@Repository
+@Service
 @AllArgsConstructor
 public class CommentDaoJPA implements CommentDao {
 
@@ -29,6 +28,7 @@ public class CommentDaoJPA implements CommentDao {
     }
 
     @Override
+    @Transactional
     public void deleteById(long id) {
         Comment comment = getById(id);
         entityManager.remove(comment);

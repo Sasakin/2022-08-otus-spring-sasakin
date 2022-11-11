@@ -36,6 +36,7 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
+    @Transactional
     public void deleteById(long id) {
         dao.deleteById(id);
     }

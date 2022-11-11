@@ -1,4 +1,4 @@
-package ru.otus.spring.book.saver;
+package ru.otus.spring.book.tools.saver;
 
 import org.springframework.stereotype.Component;
 import ru.otus.spring.book.dao.GenreDao;
@@ -8,8 +8,6 @@ import ru.otus.spring.book.domain.Comment;
 import ru.otus.spring.book.domain.Genre;
 import ru.otus.spring.book.services.AuthorService;
 import ru.otus.spring.book.services.BookService;
-
-import javax.transaction.Transactional;
 
 
 @Component
@@ -66,13 +64,11 @@ public class BookSaverImpl implements BookSaver {
         Author author = authorService.getByName(authorName);
         if(author == null) {
             author = new Author(null, authorName);
-            //authorService.insert(author);
         }
 
         Genre genre = genreService.getByTitle(genreTitle);
         if(genre == null) {
             genre = new Genre(null, genreTitle);
-            //genreService.insert(genre);
         }
 
         Book book = new Book(bookTitle, author, genre);
