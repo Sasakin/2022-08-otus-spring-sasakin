@@ -1,11 +1,7 @@
-package ru.otus.spring.book.saver;
+package ru.otus.spring.book.tools.saver;
 
 import org.springframework.stereotype.Component;
 import ru.otus.spring.book.dao.GenreDao;
-import ru.otus.spring.book.domain.Author;
-import ru.otus.spring.book.domain.Book;
-import ru.otus.spring.book.domain.Comment;
-import ru.otus.spring.book.domain.Genre;
 import ru.otus.spring.book.services.AuthorService;
 import ru.otus.spring.book.services.BookService;
 

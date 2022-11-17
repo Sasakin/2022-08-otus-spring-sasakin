@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.otus.spring.book.dao.AuthorDao;
 import ru.otus.spring.book.domain.Author;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service

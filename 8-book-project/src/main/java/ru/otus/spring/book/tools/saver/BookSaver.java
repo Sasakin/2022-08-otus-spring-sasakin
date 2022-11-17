@@ -1,4 +1,4 @@
-package ru.otus.spring.book.saver;
+package ru.otus.spring.book.tools.saver;
 
 public interface BookSaver {
 

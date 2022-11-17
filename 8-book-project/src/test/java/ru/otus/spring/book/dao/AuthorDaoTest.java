@@ -4,28 +4,24 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.transaction.AfterTransaction;
 import org.springframework.test.context.transaction.BeforeTransaction;
 import ru.otus.spring.book.domain.Author;
+import ru.otus.spring.book.services.SequenceGeneratorService;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 
 @DisplayName("Тест Dao для работы с авторами")
 @SpringBootTest
-//@DataJpaTest
-//@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-//@Sql("/data.sql")
-public class AuthorDaoJPATest {
+public class AuthorDaoTest {
 
-    private static final String EXISTING_AUTHOR_NAME = "Ivan";
+    private static final String EXISTING_AUTHOR_NAME = "Игорь";
+
+    @Autowired
+    private SequenceGeneratorService sequenceGeneratorService;
 
     @Autowired
     private AuthorDao authorDao;
@@ -52,18 +48,20 @@ public class AuthorDaoJPATest {
     @Test
     void shouldInsertAuthor() {
         Author expectedAuthor = new Author(null, "Igor");
+        expectedAuthor.setId(sequenceGeneratorService.generateSequence(Author.SEQUENCE_NAME));
         authorDao.save(expectedAuthor);
-        List<Author> actualAuthor = authorDao.findAll();
+        List<Author> actualAuthors = authorDao.findAll();
+        Author actualAuthor = actualAuthors.get(actualAuthors.indexOf(expectedAuthor));
         assertThat(actualAuthor).usingRecursiveComparison().isEqualTo(expectedAuthor);
     }
 
     @DisplayName("Удалять заданного автора по его id")
     @Test
     void shouldCorrectDeleteAuthorById() {
-        /*Author author = authorDao.getByName(EXISTING_AUTHOR_NAME);
+        Author author = authorDao.getByName(EXISTING_AUTHOR_NAME);
         Long id = author.getId();
         authorDao.deleteById(id);
 
-        Assertions.assertNull(authorDao.findById(id).orElse(null));*/
+        Assertions.assertNull(authorDao.findById(id).orElse(null));
     }
 }

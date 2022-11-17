@@ -4,19 +4,17 @@ import lombok.AllArgsConstructor;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
-import ru.otus.spring.book.domain.Author;
-import ru.otus.spring.book.domain.Book;
-import ru.otus.spring.book.domain.Genre;
-import ru.otus.spring.book.printer.Printer;
-import ru.otus.spring.book.saver.BookSaver;
-
-import java.util.List;
+import ru.otus.spring.book.tools.printer.Printer;
+import ru.otus.spring.book.tools.saver.BookSaver;
+import ru.otus.spring.book.tools.updater.BookUpdater;
 
 @ShellComponent
 @AllArgsConstructor
 public class BookShellController {
 
     private BookSaver bookSaver;
+
+    private BookUpdater bookUpdater;
 
     private Printer printer;
 
@@ -45,6 +43,18 @@ public class BookShellController {
     @ShellMethod(key = "print-genres", value = "Print all genres")
     public void printGenres() {
        printer.printGenres();
+    }
+
+    @ShellMethod(key = "add-comment-to-book", value = "Add comment to book")
+    public void addCommentToBook(@ShellOption("-id") Long bookId,
+                                 @ShellOption("-comment") String comment) {
+
+        bookUpdater.byId(bookId).addBookComments(comment).update();
+    }
+
+    @ShellMethod(key = "print-comments-by-bookId", value = "Print all comments by book")
+    public void printCommentsByBookId(@ShellOption("-id") Long bookId) {
+        printer.printCommentsByBookId(bookId);
     }
 
 

@@ -5,6 +5,5 @@ import ru.otus.spring.book.domain.Author;
 
 public interface AuthorDao extends MongoRepository<Author, Long> {
 
-   /* @Query("select a from Author a where a.name = :name")
-    Author getByName(String name);*/
+    Author getByName(String name);
 }

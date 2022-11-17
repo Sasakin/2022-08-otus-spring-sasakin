@@ -1,90 +1,116 @@
-package ru.otus.spring.book.services;
+package ru.otus.spring.book.dao;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.util.Assert;
-import ru.otus.spring.book.dao.BookDao;
 import ru.otus.spring.book.domain.Author;
 import ru.otus.spring.book.domain.Book;
 import ru.otus.spring.book.domain.Comment;
 import ru.otus.spring.book.domain.Genre;
+import ru.otus.spring.book.services.SequenceGeneratorService;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
 
 @DisplayName("Тест Dao для работы с книгами")
 @SpringBootTest
-public class BookServiceTest {
+public class BookDaoTest {
+
+    @Autowired
+    private BookDao bookDao;
 
     @Autowired
     private SequenceGeneratorService sequenceGeneratorService;
 
-    @MockBean
-    private BookDao bookDao;
-
-    @Autowired
-    private BookServiceImpl bookService;
 
     @Test
     public void testInsert() {
         Author author = new Author(sequenceGeneratorService.generateSequence(Author.SEQUENCE_NAME), "Ivan");
         Genre genre = new Genre(sequenceGeneratorService.generateSequence(Genre.SEQUENCE_NAME), "Mystic");
 
-        Book book = new Book(sequenceGeneratorService.generateSequence(Book.SEQUENCE_NAME), "Once a time in Paris", author, genre, new ArrayList<>());
+        Book book = new Book(sequenceGeneratorService.generateSequence(Book.SEQUENCE_NAME),"Silent hill", author, genre, new ArrayList<>());
 
-        when(bookDao.save(any(Book.class))).thenReturn(book);
+        bookDao.save(book);
 
-        bookService.save(book);
+        Book fromBDBook = bookDao.findById(book.getId()).orElse(null);
+
+        Assert.notNull(fromBDBook, "Book is inserted");
+    }
+
+    @Test
+    public void testUpdate() {
+        Author author = new Author(sequenceGeneratorService.generateSequence(Author.SEQUENCE_NAME), "Vasily");
+        Genre genre = new Genre(sequenceGeneratorService.generateSequence(Genre.SEQUENCE_NAME), "Comedy");
+
+        Book book = new Book(sequenceGeneratorService.generateSequence(Book.SEQUENCE_NAME), "Silent holl2", author, genre, new ArrayList<>());
+
+        bookDao.save(book);
+
+        Book fromBDBook = bookDao.findById(book.getId()).orElse(null);
+
+        Assert.notNull(fromBDBook, "Book is inserted");
+
+        fromBDBook.setTitle("Silent hill");
+
+        bookDao.save(fromBDBook);
+
+        Book fromBDBook2 = bookDao.findById(book.getId()).orElse(null);
+
+        Assertions.assertEquals("Silent hill", fromBDBook2.getTitle());
     }
 
     @Test
     public void testDelete() {
-        doNothing().when(bookDao).deleteById(any(Long.class));
+        Author author = new Author(sequenceGeneratorService.generateSequence(Author.SEQUENCE_NAME), "Vasily Ivanov");
+        Genre genre = new Genre(sequenceGeneratorService.generateSequence(Genre.SEQUENCE_NAME), "Comedy for students");
 
-        Long id = 1l;
-        bookService.deleteById(id);
+        Book book = new Book(sequenceGeneratorService.generateSequence(Book.SEQUENCE_NAME), "Once a time in Paris", author, genre, new ArrayList<>());
+
+        bookDao.save(book);
+
+        Book fromBDBook = bookDao.findById(book.getId()).orElse(null);
+
+        Assert.notNull(fromBDBook, "Book is inserted");
+
+        Long id = book.getId();
+        bookDao.deleteById(id);
+
+        Assert.isNull(bookDao.findById(id).orElse(null), "Book is deleted");
 
     }
 
     @Test
     public void testGetById() {
-        Author author = new Author(sequenceGeneratorService.generateSequence(Author.SEQUENCE_NAME), "Ivan");
-        Genre genre = new Genre(sequenceGeneratorService.generateSequence(Genre.SEQUENCE_NAME), "Mystic");
+        Author author = new Author(sequenceGeneratorService.generateSequence(Author.SEQUENCE_NAME), "Vasily Ivanov");
+        Genre genre = new Genre(sequenceGeneratorService.generateSequence(Genre.SEQUENCE_NAME), "Comedy for students");
 
         Book book = new Book(sequenceGeneratorService.generateSequence(Book.SEQUENCE_NAME), "Once a time in Paris", author, genre, new ArrayList<>());
 
-        when(bookDao.save(any(Book.class))).thenReturn(book);
-
-        bookService.save(book);
+        bookDao.save(book);
 
         Assert.notNull(book.getId(), "Book is inserted");
 
         Long id = book.getId();
-        when(bookDao.findById(id)).thenReturn(Optional.of(book));
 
-        Assert.notNull(bookService.getById(id), "");
+        Assert.notNull(bookDao.findById(id).orElse(null), "");
     }
-
 
     @DisplayName("должен загружать список всех книг с полной информацией о них")
     @Test
     void shouldReturnCorrectStudentsListWithAllInfo() {
-
         Author author = new Author(sequenceGeneratorService.generateSequence(Author.SEQUENCE_NAME), "Vasily Ivanov");
         Genre genre = new Genre(sequenceGeneratorService.generateSequence(Genre.SEQUENCE_NAME), "Comedy for students");
 
         Book book1 = new Book(sequenceGeneratorService.generateSequence(Book.SEQUENCE_NAME), "New book. Tom 1", author, genre, new ArrayList<>());
         Book book2 = new Book(sequenceGeneratorService.generateSequence(Book.SEQUENCE_NAME), "New book. Tom 2", author, genre, new ArrayList<>());
+
+        bookDao.save(book1);
+        bookDao.save(book2);
 
         book1.setComments(new ArrayList<>());
         book2.setComments(new ArrayList<>());
@@ -99,19 +125,11 @@ public class BookServiceTest {
             book2.getComments().add(c);
         });
 
-        when(bookDao.save(any(Book.class))).thenReturn(book1);
-
-        bookService.save(book1);
-        bookService.save(book2);
-
-        List<Book> bookList = new ArrayList<>();
-        bookList.add(book1);
-        bookList.add(book2);
-
-        when(bookDao.findAll()).thenReturn(bookList);
+        bookDao.save(book1);
+        bookDao.save(book2);
 
         System.out.println("\n\n\n\n----------------------------------------------------------------------------------------------------------");
-        var books = bookService.getAll();
+        var books = bookDao.findAll();
         assertThat(books).isNotNull()
                 .allMatch(b -> !b.getTitle().equals(""))
                 .allMatch(b -> b.getGenre() != null)
@@ -119,5 +137,4 @@ public class BookServiceTest {
                 .allMatch(b -> b.getComments() != null);
         System.out.println("----------------------------------------------------------------------------------------------------------\n\n\n\n");
     }
-
 }

@@ -19,6 +19,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 public class AuthorServiceTest {
 
+    @Autowired
+    private SequenceGeneratorService sequenceGeneratorService;
+
     @MockBean
     private AuthorDao authorDao;
 
@@ -29,8 +32,8 @@ public class AuthorServiceTest {
     @Test
     void shouldReturnExpectedAuthorCount() {
         List<Author> authorList = new ArrayList<>();
-        authorList.add(new Author(1l, "Genry"));
-        authorList.add(new Author(2l, "S King"));
+        authorList.add(new Author(sequenceGeneratorService.generateSequence(Author.SEQUENCE_NAME), "Genry"));
+        authorList.add(new Author(sequenceGeneratorService.generateSequence(Author.SEQUENCE_NAME), "S King"));
 
         Mockito.when(authorDao.findAll()).thenReturn(authorList);
 
@@ -39,10 +42,10 @@ public class AuthorServiceTest {
     }
 
 
-    @DisplayName("Добавлять автора в БД")
+    @DisplayName("Получить автора по ID")
     @Test
     void getAuthorById() {
-        Author expectedAuthor = new Author(1l, "Igor");
+        Author expectedAuthor = new Author(sequenceGeneratorService.generateSequence(Author.SEQUENCE_NAME), "Igor");
         Mockito.when(authorDao.findById(expectedAuthor.getId())).thenReturn(Optional.of(expectedAuthor));
 
         Author actualAuthor = authorService.getById(expectedAuthor.getId());
