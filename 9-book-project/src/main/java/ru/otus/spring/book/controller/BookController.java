@@ -28,11 +28,10 @@ public class BookController {
 
     private final GenreService genreService;
 
-    @GetMapping("/")
+    @GetMapping({"/", "book/list"})
     public String listPage(Model model) {
         List<Book> books = bookService.getAll();
         model.addAttribute("books", books);
-        model.addAttribute("author", new Author());
         return "list";
     }
 
@@ -58,12 +57,6 @@ public class BookController {
         model.addAttribute("genres", genres);
         model.addAttribute("title", "Edit book");
 
-        return "edit";
-    }
-
-    @PostMapping("/edit")
-    public String searchAuthor(@ModelAttribute Author author) {
-        //bookService.save(book);
         return "edit";
     }
 

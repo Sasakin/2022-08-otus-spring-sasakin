@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Тест Dao для работы с книгами")
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class BookDaoJdbcTest {
+public class BookDaoJPATest {
 
     private static int EXPECTED_COUNT_BOOKS = 2;
 
