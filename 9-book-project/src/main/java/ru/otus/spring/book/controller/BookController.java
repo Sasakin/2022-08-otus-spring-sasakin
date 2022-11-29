@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -15,6 +16,7 @@ import ru.otus.spring.book.services.BookService;
 import ru.otus.spring.book.services.GenreService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -30,6 +32,19 @@ public class BookController {
     public String listPage(Model model) {
         List<Book> books = bookService.getAll();
         model.addAttribute("books", books);
+        model.addAttribute("author", new Author());
+        return "list";
+    }
+
+    @GetMapping("/book/search")
+    public String listPageWithSearch(@ModelAttribute("keyword") String keyword, Model model) {
+        List<Book> books = bookService.getAll();
+        List<Book> bookListFiltered = books.stream()
+                .filter(book -> book.getTitle() != null
+                                && book.getTitle().toLowerCase().contains(keyword.toLowerCase()))
+                .limit(15l)
+                .collect(Collectors.toList());
+        model.addAttribute("books", bookListFiltered);
         return "list";
     }
 
@@ -41,14 +56,15 @@ public class BookController {
         model.addAttribute("authors", authors);
         List<Genre> genres = genreService.getAll();
         model.addAttribute("genres", genres);
+        model.addAttribute("title", "Edit book");
 
         return "edit";
     }
 
     @PostMapping("/edit")
-    public String savebook(Book book) {
-        bookService.save(book);
-        return "redirect:/";
+    public String searchAuthor(@ModelAttribute Author author) {
+        //bookService.save(book);
+        return "edit";
     }
 
     @GetMapping("/book/add")
