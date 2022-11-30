@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>List of all books</title>
+    <link rel="stylesheet" type="text/css" th:href="@{webjars/bootstrap/css/bootstrap.min.css}">
+
+    <link th:rel="stylesheet" th:href="@{assets/select2-develop/dist/css/select2.css}"/>
+    <link th:rel="stylesheet" th:href="@{assets/select2-bootstrap4-theme-master/dist/select2-bootstrap4.css}"/>
+
+    <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="text-center"><h3 class="text-center">Books:</h3></div>
+    <!--<div class="alert alert-success" th:if="${message}">
+        [[${message}]]
+    </div> -->
+
+    <div class="text-center">
+        <a th:href="@{/book/add}">Add new book</a>
+    </div>
+    <!--<form th:action="@{/book/search}" method="get">
+        <input type="text" name="keyword" th:value="${keyword}"  placeholder="Find book by title" size="50" >
+        <button type="submit" class="btn btn-info" >Search</button>
+        <button type="submit" class="btn btn-info" >Reset</button>
+    </form> -->
+    <table class="table table-bordered">
+        <thead class="thead-dark">
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Genre</th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    $(function () {
+        $.get('/api/book/list').done(function (books) {
+            books.forEach(function (book) {
+                $('tbody').append(`
+                    <tr>
+                        <td>${book.id}</td>
+                        <td>${book.title}</td>
+                        <td>${book.author.name}</td>
+                        <td>${book.genre.title}</td>
+                    </tr>
+                `)
+            });
+        })
+    });
+</script>
+</body>
+</html>
