@@ -48,7 +48,7 @@
                     <a href="comments.html" th:href="@{/comment/list(id=${book.id})}" class="h4">Comments</a>
                 </td>
                 <td>
-                    <a href="edit.html" th:href="@{/edit(id=${book.id})}" class="h4">Edit</a>
+                    <a href="edit.html" th:href="@{/book/edit(id=${book.id})}" class="h4">Edit</a>
                 </td>
                 <td>
                     <a th:href="@{/book/delete/(id=${book.id})}" class="h4">Delete</a>

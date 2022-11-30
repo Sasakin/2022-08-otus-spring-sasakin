@@ -15,6 +15,7 @@ import ru.otus.spring.book.services.AuthorService;
 import ru.otus.spring.book.services.BookService;
 import ru.otus.spring.book.services.GenreService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,7 +48,7 @@ public class BookController {
         return "list";
     }
 
-    @GetMapping("/edit")
+    @GetMapping("/book/edit")
     public String editPage(@RequestParam("id") long id, Model model) {
         Book book = bookService.getById(id).orElseThrow(NotFoundException::new);
         model.addAttribute("book", book);
@@ -66,6 +67,14 @@ public class BookController {
         book.setAuthor(new Author(""));
         book.setGenre(new Genre(""));
         model.addAttribute("book", book);
+        List<Author> authors = new ArrayList<>();
+        authors.add(new Author());
+        authors.addAll(authorService.getAll());
+        model.addAttribute("authors", authors);
+        List<Genre> genres = new ArrayList<>();
+        genres.add(new Genre());
+        genres.addAll(genreService.getAll());
+        model.addAttribute("genres", genres);
         return "addBook";
     }
 

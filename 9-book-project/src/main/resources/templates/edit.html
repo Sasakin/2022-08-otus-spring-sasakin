@@ -7,7 +7,7 @@
 <body>
 
 <!-- Book edition -->
-<form id="edit-form" action="edit.html" th:method="post" th:action="@{/edit(id=${book.id})}" th:object="${book}">
+<form id="edit-form" action="edit.html" th:method="post" th:action="@{/book/edit(id=${book.id})}" th:object="${book}">
     <h3>Book Info:</h3>
 
     <div class="row">
@@ -33,6 +33,7 @@
         <select class="form-control" id="book-genre-input" th:field="*{genre}" value="Book Genre">
             <option th:each="genre : ${genres}" th:value="${genre.id}" th:text="${genre.title}"></option>
         </select>
+        <a th:href="@{/genre/add}" class="h4">Add new genre</a>
     </div>
 
     <div class="row">
