@@ -3,43 +3,108 @@
 <head>
     <meta charset="UTF-8"/>
     <title>Edit book</title>
+    <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+    <link th:rel="stylesheet" th:href="@{../webjars/bootstrap/4.3.1/css/bootstrap.min.css}">
+
+    <!-- jQuery Modal
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />-->
+
 </head>
 <body>
 
-<!-- Book edition -->
-<form id="edit-form" action="edit.html" th:method="post" th:action="@{/edit(id=${book.id})}" th:object="${book}">
-    <h3>Book Info:</h3>
+<div class="container-fluid" style="max-width: 500px; margin: 0 auto">
+    <div><h2 class="text-center">Edit book</h2></div>
+    <div>
+        <div class="border border-secondary rounded p-3">
+            <div class="form-group row">
+                <label class="col-sm-4 col-form-label">Title:</label>
+                <div class="col-sm-8">
+                    <input id="title-input" type="text" class="form-control" required minlength="3" maxlength="100">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="author-input" class="col-sm-4 col-form-label">Author:</label>
+                <select class="form-control col-sm-8" id="author-input" name="author-input">
+                    <option></option>
+                </select>
+                <a href="/author/add" class="h4">Add new author</a>
+            </div>
 
-    <div class="row">
-        <label for="id-input">ID:</label>
-        <input id="id-input" type="text" readonly="readonly" value="1" th:value="*{id}"/>
+            <div class="form-group row">
+                <label for="genre-input" class="col-sm-4 col-form-label">Genre:</label>
+                <select class="form-control col-sm-8" id="genre-input">
+                    <option></option>
+                </select>
+                <a href="/genre/add" class="h4">Add new genre</a>
+            </div>
+            <div class="text-center">
+                <button id="save" type="submit" class="btn btn-primary m-2">Save</button>
+                <a href="/">
+                    <button type="button" class="btn btn-secondary m-2">Cancel</button>
+                </a>
+            </div>
+        </div>
     </div>
+</div>
 
-    <div class="row">
-        <label for="book-title-input">Title:</label>
-        <input id="book-title-input" name="title" type="text" value="Book Title" th:value="*{title}"/>
-    </div>
 
-    <div class="row">
-        <label for="book-author-input">Author:</label>
-        <select class="form-control" id="book-author-input" th:field="*{author}" value="Book Author">
-            <option th:each="author : ${authors}" th:value="${author.id}" th:text="${author.name}"></option>
-        </select>
-        <a th:href="@{/author/add}" class="h4">Add new author</a>
-    </div>
+<script>
+    var CACHE = new Object();
 
-    <div class="row">
-        <label for="book-genre-input">Genre:</label>
-        <select class="form-control" id="book-genre-input" th:field="*{genre}" value="Book Genre">
-            <option th:each="genre : ${genres}" th:value="${genre.id}" th:text="${genre.title}"></option>
-        </select>
-    </div>
+    jQuery["postJSON"] = function (url, data, callback) {
+        // shift arguments if data argument was omitted
+        if (jQuery.isFunction(data)) {
+            callback = data;
+            data = undefined;
+        }
 
-    <div class="row">
-        <button type="submit">Save</button>
-        <a href="list.html" th:href="@{/}"><button type="button">Cancel</button></a>
-    </div>
-</form>
+        return jQuery.ajax({
+            url: url,
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: data,
+            complete: callback
+        });
+    };
+
+    $(function () {
+        const id = [[${id}]];
+        $.get('/api/book/edit', {id: id}).done(function (editBookDataResponse) {
+            var book = editBookDataResponse.book
+            CACHE.book = book;
+            var authors = editBookDataResponse.authors
+            var genres = editBookDataResponse.genres
+            $("#title-input").val(book.title).change();
+
+            for (var index = 0; index < authors.length; index++) {
+                $('#author-input').append('<option value="' + authors[index].name + '">' + authors[index].name + '</option>');
+            }
+            $("#author-input").val(book.author.name).change();
+
+            for (var index = 0; index < genres.length; index++) {
+                $('#genre-input').append('<option value="' + genres[index].title + '">' + genres[index].title + '</option>');
+            }
+            $('#genre-input').val(book.genre.title).change();
+        });
+        $('#save').click(function () {
+            CACHE.book.title = $("#title-input").val()
+            CACHE.book.author.id = null
+            CACHE.book.author.name = $("#author-input").val()
+            CACHE.book.genre.id = null
+            CACHE.book.genre.title = $("#genre-input").val()
+            var id = CACHE.book.id
+            var title = CACHE.book.title
+            var author = CACHE.book.author
+            var genre = CACHE.book.genre
+            var bookDto = {id, title, author, genre};
+            $.postJSON("/api/book/save", JSON.stringify(bookDto), function (resp) {
+                window.location.href="../"
+            })
+        });
+    });
+</script>
 
 </body>
 </html>

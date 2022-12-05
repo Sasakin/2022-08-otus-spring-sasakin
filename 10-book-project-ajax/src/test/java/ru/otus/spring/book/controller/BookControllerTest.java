@@ -1,6 +1,5 @@
 package ru.otus.spring.book.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -34,9 +33,6 @@ class BookControllerTest {
     @Autowired
     private MockMvc mvc;
 
-    @Autowired
-    private ObjectMapper mapper;
-
     @MockBean
     private BookDao bookRepository;
 
@@ -69,7 +65,7 @@ class BookControllerTest {
         List<Book> books = List.of(new Book(1L, "Silent hill", author, genre, new ArrayList<>()), expectedBooks.get(0));
         given(bookRepository.findAll()).willReturn(books);
 
-        mvc.perform(get("/book/search").param("keyword","Other")) //?keyword="+"Other"
+        mvc.perform(get("/book/search").param("keyword","Other"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("books", expectedBooks));
     }

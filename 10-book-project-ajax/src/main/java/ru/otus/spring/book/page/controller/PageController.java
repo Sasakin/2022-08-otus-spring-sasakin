@@ -6,38 +6,31 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.otus.spring.book.domain.Author;
 import ru.otus.spring.book.domain.Book;
 import ru.otus.spring.book.domain.Genre;
-import ru.otus.spring.book.services.AuthorService;
-import ru.otus.spring.book.services.BookService;
-import ru.otus.spring.book.services.GenreService;
 
 @Controller
 @AllArgsConstructor
 public class PageController {
 
-    private final BookService bookService;
-
-    private final AuthorService authorService;
-
-    private final GenreService genreService;
-
     @GetMapping("/")
-    public String listPage(Model model) {
+    public String listPage() {
         return "list";
     }
 
-    @GetMapping("/edit")
+    @GetMapping("/book/edit")
     public String editPage(@RequestParam("id") long id, Model model) {
+        model.addAttribute("id", id);
         return "edit";
     }
 
-    /*@PostMapping("/edit")
-    public String savebook(Book book) {
-        bookService.save(book);
+    @PostMapping("/book/edit")
+    public String savebook(RedirectAttributes ra) {
+        ra.addFlashAttribute("message", "The book has been edited successfully.");
         return "redirect:/";
-    }*/
+    }
 
     @GetMapping("/book/add")
     public String beforeBookAdd(Model model) {
@@ -48,16 +41,14 @@ public class PageController {
         return "addBook";
     }
 
-    /*@PostMapping("/book/save")
-    public String saveBook(Book book,  RedirectAttributes ra) {
-        bookService.save(book);
+    @PostMapping("/book/save")
+    public String saveBook(RedirectAttributes ra) {
         ra.addFlashAttribute("message", "The book has been saved successfully.");
         return "redirect:/";
-    }*/
+    }
 
-    /*@GetMapping("/book/delete")
-    public String deleteBook(@RequestParam("id") long id) {
-        bookService.deleteById(id);
+    @GetMapping("/book/delete")
+    public String deleteBook() {
         return "redirect:/";
-    }*/
+    }
 }

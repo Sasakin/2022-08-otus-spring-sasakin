@@ -1,26 +1,23 @@
-package ru.otus.spring.book.rest.controller;
+package ru.otus.spring.book.page.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import ru.otus.spring.book.domain.Genre;
 import ru.otus.spring.book.services.GenreService;
 
-@RestController
-@RequestMapping("/api/genre")
+@Controller
 @RequiredArgsConstructor
-public class GenreController {
+public class GenrePageController {
 
     private final GenreService service;
 
     @GetMapping("/genre/add")
     public String addGenreGet(Model model) {
         model.addAttribute("genre", new Genre());
-        return "addGenre";
+        return "addAuthor";
     }
 
     @PostMapping("/genre/add")

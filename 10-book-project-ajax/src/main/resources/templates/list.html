@@ -15,9 +15,9 @@
 
 <div class="container-fluid">
     <div class="text-center"><h3 class="text-center">Books:</h3></div>
-    <!--<div class="alert alert-success" th:if="${message}">
+    <div class="alert alert-success" th:if="${message}">
         [[${message}]]
-    </div> -->
+    </div>
 
     <div class="text-center">
         <a th:href="@{/book/add}">Add new book</a>
@@ -54,6 +54,15 @@
                         <td>${book.title}</td>
                         <td>${book.author.name}</td>
                         <td>${book.genre.title}</td>
+                        <td>
+                            <a href="/comment/list?id=${book.id}" class="h4">Comments</a>
+                        </td>
+                        <td>
+                            <a href="/book/edit?id=${book.id}" class="h4">Edit</a>
+                        </td>
+                        <td>
+                            <a href="/book/delete?id=${book.id}" class="h4">Delete</a>
+                        </td>
                     </tr>
                 `)
             });

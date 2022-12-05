@@ -1,11 +1,14 @@
 package ru.otus.spring.book.rest.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +19,8 @@ import ru.otus.spring.book.domain.Genre;
 import ru.otus.spring.book.rest.controller.dto.AuthorDto;
 import ru.otus.spring.book.rest.controller.dto.BookDto;
 import ru.otus.spring.book.rest.controller.dto.GenreDto;
+import ru.otus.spring.book.rest.controller.request.EditBookDataRequest;
+import ru.otus.spring.book.rest.controller.response.EditBookDataResponse;
 import ru.otus.spring.book.services.AuthorService;
 import ru.otus.spring.book.services.BookService;
 import ru.otus.spring.book.services.GenreService;
@@ -65,18 +70,38 @@ public class BookController {
         return bookListFiltered;
     }
 
-   /* @GetMapping("/edit")
-    public String editPage(@RequestParam("id") long id, Model model) {
+   @GetMapping("/edit")
+    public EditBookDataResponse editPage(@RequestParam("id") long id) {
         Book book = bookService.getById(id).orElseThrow(NotFoundException::new);
-        model.addAttribute("book", book);
-        List<Author> authors = authorService.getAll();
-        model.addAttribute("authors", authors);
-        List<Genre> genres = genreService.getAll();
-        model.addAttribute("genres", genres);
-        model.addAttribute("title", "Edit book");
+        AuthorDto authorDto = AuthorDto.toDto(book.getAuthor());
+        GenreDto genreDto = GenreDto.toDto(book.getGenre());
+        BookDto bookDto = BookDto.toDto(book, authorDto, genreDto);
 
-        return "edit";
+        List<Author> authors = authorService.getAll();
+        List<Genre> genres = genreService.getAll();
+
+        return new EditBookDataResponse(bookDto,
+                authors.stream().map(author -> AuthorDto.toDto(author)).collect(Collectors.toList()),
+                genres.stream().map(genre -> GenreDto.toDto(genre)).collect(Collectors.toList()));
+    }
+
+    /*@PostMapping("/add")
+    public String saveBook(EditBookDataRequest requestData, RedirectAttributes ra) {
+        BookDto book = requestData.getBook();
+        //bookService.save(book);
+        ra.addFlashAttribute("message", "The book has been saved successfully.");
+        return "redirect:/";
     }*/
+
+    @PostMapping("/save")
+    public ResponseEntity<Void> saveBook(@RequestBody BookDto bookDto, RedirectAttributes ra) {
+        Author author = AuthorDto.toAuthor(bookDto.getAuthor());
+        Genre genre = GenreDto.toGenre(bookDto.getGenre());
+        Book book = BookDto.toBook(bookDto, author, genre);
+        bookService.save(book);
+        ra.addFlashAttribute("message", "The book has been saved successfully.");
+        return new ResponseEntity<Void>(HttpStatus.OK);
+    }
 
    /* @GetMapping("/add")
     public String beforeBookAdd(Model model) {
@@ -85,13 +110,6 @@ public class BookController {
         book.setGenre(new Genre(""));
         model.addAttribute("book", book);
         return "addBook";
-    }
-
-    @PostMapping("/save")
-    public String saveBook(Book book,  RedirectAttributes ra) {
-        bookService.save(book);
-        ra.addFlashAttribute("message", "The book has been saved successfully.");
-        return "redirect:/";
     }
 
     @GetMapping("/delete")

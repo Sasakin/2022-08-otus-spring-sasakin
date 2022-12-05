@@ -1,20 +1,16 @@
-package ru.otus.spring.book.rest.controller;
+package ru.otus.spring.book.page.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import ru.otus.spring.book.domain.Author;
 import ru.otus.spring.book.services.AuthorService;
 
-@RestController
-@RequestMapping("/api/author")
+@Controller
 @RequiredArgsConstructor
-public class AuthorController {
+public class AuthorPageController {
 
     private final AuthorService service;
 

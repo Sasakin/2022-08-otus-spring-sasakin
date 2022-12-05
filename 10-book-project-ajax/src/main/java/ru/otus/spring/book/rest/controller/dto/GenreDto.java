@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import ru.otus.spring.book.domain.Genre;
 
+import java.io.Serializable;
+
 @Data
 @AllArgsConstructor
-public class GenreDto {
+public class GenreDto  implements Serializable {
 
     private Long id;
 
@@ -16,4 +18,9 @@ public class GenreDto {
     public static GenreDto toDto(@NotNull Genre genre) {
         return new GenreDto(genre.getId(), genre.getTitle());
     }
+
+    public static Genre toGenre(@NotNull GenreDto genreDto) {
+        return new Genre(genreDto.getId(), genreDto.getTitle());
+    }
+
 }
