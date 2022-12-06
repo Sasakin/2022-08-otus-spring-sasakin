@@ -3,24 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <title>Add comment</title>
-    <link th:rel="stylesheet" th:href="@{webjars/bootstrap/4.3.1/css/bootstrap.min.css}">
+    <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+    <link th:rel="stylesheet" th:href="@{../webjars/bootstrap/4.3.1/css/bootstrap.min.css}">
 </head>
 <body>
 <div class="container-fluid" style="max-width: 500px; margin: 0 auto">
     <div><h2 class="text-center">Add new comment</h2></div>
     <div>
-        <form th:action="@{/comment/add}" method="post" th:object="${comment}">
-            <div class="border border-secondary rounded p-3">
-                <div class="form-group row">
-                    <label class="col-sm-4 col-form-label">Text:</label>
-                    <div class="col-sm-8">
-                        <input type="text" th:field="*{text}" class="form-control" required minlength="3" maxlength="100">
-                    </div>
+        <div class="border border-secondary rounded p-3">
+            <div class="form-group row">
+                <label class="col-sm-4 col-form-label">Text:</label>
+                <div class="col-sm-8">
+                    <input id="comment-input" type="text" class="form-control" required minlength="3" maxlength="100">
                 </div>
             </div>
-        </form>
+            <div class="text-center">
+                <button id="save" type="submit" class="btn btn-primary m-2">Save</button>
+                <a href="../">
+                    <button type="button" class="btn btn-secondary m-2">Cancel</button>
+                </a>
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+    jQuery["postJSON"] = function (url, data, callback) {
+        // shift arguments if data argument was omitted
+        if (jQuery.isFunction(data)) {
+            callback = data;
+            data = undefined;
+        }
+
+        return jQuery.ajax({
+            url: url,
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: data,
+            complete: callback
+        });
+    };
+
+    $(function () {
+        $('#save').click(function () {
+            const bookId = [[${bookId}]];
+            const text = $("#comment-input").val();
+            const commentWrapper = {bookId, text};
+            $.postJSON("/api/comment/save", JSON.stringify(commentWrapper), function () {
+                window.location.href="../"
+            })
+        });
+    });
+</script>
 
 </body>
 </html>

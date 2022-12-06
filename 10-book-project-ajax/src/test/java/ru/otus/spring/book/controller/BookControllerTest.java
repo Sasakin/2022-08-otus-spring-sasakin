@@ -1,5 +1,6 @@
 package ru.otus.spring.book.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -13,6 +14,10 @@ import ru.otus.spring.book.domain.Author;
 import ru.otus.spring.book.domain.Book;
 import ru.otus.spring.book.domain.Genre;
 import ru.otus.spring.book.rest.controller.BookController;
+import ru.otus.spring.book.rest.controller.dto.AuthorDto;
+import ru.otus.spring.book.rest.controller.dto.BookDto;
+import ru.otus.spring.book.rest.controller.dto.GenreDto;
+import ru.otus.spring.book.rest.controller.response.EditBookDataResponse;
 import ru.otus.spring.book.services.AuthorServiceImpl;
 import ru.otus.spring.book.services.BookServiceImpl;
 import ru.otus.spring.book.services.GenreServiceImpl;
@@ -20,10 +25,11 @@ import ru.otus.spring.book.services.GenreServiceImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BookController.class)
@@ -50,9 +56,13 @@ class BookControllerTest {
         List<Book> books = List.of(new Book("Silent hill", author, genre), new Book("Silent hill2", author, genre));
         given(bookRepository.findAll()).willReturn(books);
 
-        mvc.perform(get("/book/list"))
+        AuthorDto authorDto = AuthorDto.toDto(author);
+        GenreDto genreDto = GenreDto.toDto(genre);
+        BookDto bookDto = BookDto.toDto(books.get(0), authorDto, genreDto);
+
+        var r = mvc.perform(get("/api/book/list"))
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("book", books));
+                .andExpect(content().string(asJsonString(List.of(bookDto))));
     }
 
     @Test
@@ -65,9 +75,13 @@ class BookControllerTest {
         List<Book> books = List.of(new Book(1L, "Silent hill", author, genre, new ArrayList<>()), expectedBooks.get(0));
         given(bookRepository.findAll()).willReturn(books);
 
-        mvc.perform(get("/book/search").param("keyword","Other"))
+        AuthorDto authorDto = AuthorDto.toDto(author);
+        GenreDto genreDto = GenreDto.toDto(genre);
+        BookDto bookDto = BookDto.toDto(expectedBooks.get(0), authorDto, genreDto);
+
+        mvc.perform(get("api/book/search").param("keyword","Other"))
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("books", expectedBooks));
+                .andExpect(content().string(asJsonString(List.of(bookDto))));
     }
 
     @Test
@@ -84,12 +98,25 @@ class BookControllerTest {
         given(authorRepository.findAll()).willReturn(expectedAuthors);
         given(genreRepository.findAll()).willReturn(expectedGenres);
 
+        AuthorDto authorDto = AuthorDto.toDto(author);
+        GenreDto genreDto = GenreDto.toDto(genre);
+        BookDto bookDto = BookDto.toDto(book, authorDto, genreDto);
+
+        var expectedResponse = new EditBookDataResponse(bookDto,
+                expectedAuthors.stream().map(a -> AuthorDto.toDto(a)).collect(Collectors.toList()),
+                expectedGenres.stream().map(g -> GenreDto.toDto(g)).collect(Collectors.toList()))
+
         mvc.perform(get("/edit").param("id", "1"))
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("book",book))
-                .andExpect(model().attribute("authors",expectedAuthors))
-                .andExpect(model().attribute("genres", expectedGenres))
-                .andExpect(model().attribute("title", "Edit book"));
+                .andExpect(content().string(asJsonString(expectedResponse)));
+    }
+
+    public static String asJsonString(final Object obj) {
+        try {
+            return new ObjectMapper().writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

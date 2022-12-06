@@ -17,7 +17,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Entity
 @Table(name="genres")
-public class Genre  implements Serializable {
+public class Genre implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

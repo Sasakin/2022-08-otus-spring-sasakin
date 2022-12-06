@@ -22,12 +22,7 @@
     <div class="text-center">
         <a th:href="@{/book/add}">Add new book</a>
     </div>
-    <!--<form th:action="@{/book/search}" method="get">
-        <input type="text" name="keyword" th:value="${keyword}"  placeholder="Find book by title" size="50" >
-        <button type="submit" class="btn btn-info" >Search</button>
-        <button type="submit" class="btn btn-info" >Reset</button>
-    </form> -->
-    <table class="table table-bordered">
+    <table id="table" class="table table-bordered">
         <thead class="thead-dark">
         <tr>
             <th>ID</th>
@@ -61,7 +56,7 @@
                             <a href="/book/edit?id=${book.id}" class="h4">Edit</a>
                         </td>
                         <td>
-                            <a href="/book/delete?id=${book.id}" class="h4">Delete</a>
+                            <a id="delete" href="/book/delete?id=${book.id}" class="h4">Delete</a>
                         </td>
                     </tr>
                 `)

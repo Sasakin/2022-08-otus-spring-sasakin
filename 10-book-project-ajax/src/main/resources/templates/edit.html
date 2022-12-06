@@ -6,10 +6,6 @@
     <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
     <link th:rel="stylesheet" th:href="@{../webjars/bootstrap/4.3.1/css/bootstrap.min.css}">
 
-    <!-- jQuery Modal
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />-->
-
 </head>
 <body>
 
@@ -99,7 +95,7 @@
             var author = CACHE.book.author
             var genre = CACHE.book.genre
             var bookDto = {id, title, author, genre};
-            $.postJSON("/api/book/save", JSON.stringify(bookDto), function (resp) {
+            $.postJSON("/api/book/save", JSON.stringify(bookDto), function () {
                 window.location.href="../"
             })
         });

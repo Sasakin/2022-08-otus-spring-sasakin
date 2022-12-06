@@ -20,7 +20,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Entity
 @Table(name="book_comments")
-public class Comment  implements Serializable {
+public class Comment implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,6 +32,10 @@ public class Comment  implements Serializable {
     @JoinColumn(name = "book_id")
     private Book book;
 
+    public Comment(Long id, String text) {
+        this.id = id;
+        this.text = text;
+    }
 
     public Comment(String text, Book book) {
         this.text = text;

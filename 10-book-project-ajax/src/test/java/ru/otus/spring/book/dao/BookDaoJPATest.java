@@ -26,7 +26,7 @@ public class BookDaoJPATest {
 
     private static int EXPECTED_COUNT_BOOKS = 2;
 
-    private static final int EXPECTED_QUERIES_COUNT = 1;
+    private static final int EXPECTED_QUERIES_COUNT = 4;
 
     @Autowired
     private BookDao bookDaoJPA;
@@ -103,8 +103,8 @@ public class BookDaoJPATest {
     @DisplayName("должен загружать список всех книг с полной информацией о них")
     @Test
     void shouldReturnCorrectStudentsListWithAllInfo() {
-        Author author = new Author(null, "Ivan");
-        Genre genre = new Genre(null, "Mystic");
+        Author author = new Author(null, "Ivan1");
+        Genre genre = new Genre(null, "Mystic1");
 
         Book book1 = new Book("New book. Tom 1", author, genre);
         Book book2 = new Book("New book. Tom 2", author, genre);
@@ -142,6 +142,5 @@ public class BookDaoJPATest {
                 .allMatch(b -> b.getComments() != null);
         System.out.println("----------------------------------------------------------------------------------------------------------\n\n\n\n");
         assertThat(sessionFactory.getStatistics().getPrepareStatementCount()).isEqualTo(EXPECTED_QUERIES_COUNT);
-
     }
 }

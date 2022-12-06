@@ -1,6 +1,5 @@
 package ru.otus.spring.book.rest.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +18,6 @@ import ru.otus.spring.book.domain.Genre;
 import ru.otus.spring.book.rest.controller.dto.AuthorDto;
 import ru.otus.spring.book.rest.controller.dto.BookDto;
 import ru.otus.spring.book.rest.controller.dto.GenreDto;
-import ru.otus.spring.book.rest.controller.request.EditBookDataRequest;
 import ru.otus.spring.book.rest.controller.response.EditBookDataResponse;
 import ru.otus.spring.book.services.AuthorService;
 import ru.otus.spring.book.services.BookService;
@@ -85,13 +83,16 @@ public class BookController {
                 genres.stream().map(genre -> GenreDto.toDto(genre)).collect(Collectors.toList()));
     }
 
-    /*@PostMapping("/add")
-    public String saveBook(EditBookDataRequest requestData, RedirectAttributes ra) {
-        BookDto book = requestData.getBook();
-        //bookService.save(book);
-        ra.addFlashAttribute("message", "The book has been saved successfully.");
-        return "redirect:/";
-    }*/
+    @GetMapping("/add")
+    public EditBookDataResponse getAddData() {
+
+        List<Author> authors = authorService.getAll();
+        List<Genre> genres = genreService.getAll();
+
+        return new EditBookDataResponse(new BookDto(),
+                authors.stream().map(author -> AuthorDto.toDto(author)).collect(Collectors.toList()),
+                genres.stream().map(genre -> GenreDto.toDto(genre)).collect(Collectors.toList()));
+    }
 
     @PostMapping("/save")
     public ResponseEntity<Void> saveBook(@RequestBody BookDto bookDto, RedirectAttributes ra) {
@@ -103,18 +104,9 @@ public class BookController {
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
-   /* @GetMapping("/add")
-    public String beforeBookAdd(Model model) {
-        Book book = new Book();
-        book.setAuthor(new Author(""));
-        book.setGenre(new Genre(""));
-        model.addAttribute("book", book);
-        return "addBook";
-    }
-
     @GetMapping("/delete")
-    public String deleteBook(@RequestParam("id") long id) {
+    public ResponseEntity<Void> deleteBook(@RequestParam("id") long id) {
         bookService.deleteById(id);
-        return "redirect:/";
-    }*/
+        return new ResponseEntity<Void>(HttpStatus.OK);
+    }
 }

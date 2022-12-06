@@ -21,21 +21,15 @@ public class CommentsPageController {
 
     @GetMapping("/comment/list")
     public String commentList(@RequestParam("id") long id, Model model) {
-        /*Book book = bookService.getById(id).orElseThrow(NotFoundException::new);
-        model.addAttribute("book", book);
-        List<Comment> comments = book.getComments();
-        model.addAttribute("comments", comments);*/
+        model.addAttribute("id", id);
         return "comments";
     }
 
 
     @GetMapping("/comment/add")
-    public String addCommentGet(@RequestParam("id") long id, Model model) {
-        /*Book book = bookService.getById(id).orElseThrow(NotFoundException::new);
-        Comment comment = new Comment();
-        comment.setBook(book);
-        model.addAttribute("comment", comment);*/
-        return "addAuthor";
+    public String addCommentGet(@RequestParam("bookId") long id, Model model) {
+        model.addAttribute("bookId", id);
+        return "addComment";
     }
 
     @PostMapping("/comment/add")
