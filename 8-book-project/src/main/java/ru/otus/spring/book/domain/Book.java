@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-/*@Getter
-@Setter*/
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "books")
@@ -36,8 +34,6 @@ public class Book {
 
     private Genre genre;
 
-    //@Fetch(FetchMode.SUBSELECT)
-    //@OneToMany(targetEntity = Comment.class, mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Comment> comments = new ArrayList<>();
 
 }

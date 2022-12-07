@@ -23,11 +23,7 @@ public class BookShellController {
                         @ShellOption("-genre") String genreTitle,
                         @ShellOption("-title") String bookTitle,
                         @ShellOption("-comments") String... comments) {
-        bookSaver.authorName(authorName)
-                .genreTitle(genreTitle)
-                .bookTitle(bookTitle)
-                .bookComments(comments)
-                .save();
+        bookSaver.save(authorName, genreTitle, bookTitle, comments);
     }
 
     @ShellMethod(key = "print-books", value = "Print all books")
@@ -35,21 +31,11 @@ public class BookShellController {
         printer.printBooks();
     }
 
-    @ShellMethod(key = "print-authors", value = "Print all authors")
-    public void printAuthors() {
-        printer.printAuthors();
-    }
-
-    @ShellMethod(key = "print-genres", value = "Print all genres")
-    public void printGenres() {
-       printer.printGenres();
-    }
-
     @ShellMethod(key = "add-comment-to-book", value = "Add comment to book")
     public void addCommentToBook(@ShellOption("-id") Long bookId,
                                  @ShellOption("-comment") String comment) {
 
-        bookUpdater.byId(bookId).addBookComments(comment).update();
+        bookUpdater.update(bookId, comment);
     }
 
     @ShellMethod(key = "print-comments-by-bookId", value = "Print all comments by book")

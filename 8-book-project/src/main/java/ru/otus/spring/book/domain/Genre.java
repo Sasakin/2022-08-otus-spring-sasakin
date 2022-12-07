@@ -10,18 +10,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "genres")
 public class Genre {
-
-    @Transient
-    public static final String SEQUENCE_NAME = "genres_sequence";
-
-    @Id
-    private Long id;
 
     private String title;
 
-    public Genre(String title) {
-        this.title = title;
-    }
 }

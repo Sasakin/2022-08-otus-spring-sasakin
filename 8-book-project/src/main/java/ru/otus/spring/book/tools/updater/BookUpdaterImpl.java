@@ -10,39 +10,23 @@ public class BookUpdaterImpl implements  BookUpdater {
 
     private BookService bookService;
 
-    private Book book;
-
-    private String[] comments;
-
     public BookUpdaterImpl(BookService bookService) {
         this.bookService = bookService;
     }
 
     @Override
-    public BookUpdater addBookComments(String... comments) {
-        this.comments = comments;
-        return this;
-    }
-
-    @Override
-    public void update() {
+    public void update(Long bookId, String... comments) {
+        Book book = bookService.getById(bookId);
 
         if(book == null) {
             return;
         }
 
         for(String comment : comments) {
-            Comment comment1 = new Comment(comment, book);
+            Comment comment1 = new Comment(comment);
             book.getComments().add(comment1);
         }
 
         bookService.save(book);
-    }
-
-    @Override
-    public BookUpdater byId(Long bookId) {
-        book = bookService.getById(bookId);
-
-        return this;
     }
 }

@@ -14,26 +14,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-@Document(collection = "authors")
 public class Author {
-
-    @Transient
-    public static final String SEQUENCE_NAME = "authors_sequence";
-
-    @Id
-    private Long id;
 
     private String name;
 
-    public Author(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return "Author{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
-    }
 }

@@ -5,9 +5,5 @@ public interface Printer {
 
     void printBooks();
 
-    void printAuthors();
-
-    void printGenres();
-
     void printCommentsByBookId(Long bookId);
 }

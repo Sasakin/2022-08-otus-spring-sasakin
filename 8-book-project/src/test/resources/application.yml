@@ -3,7 +3,7 @@ spring:
     mongodb:
       host: localhost
       port: 27017
-      database: testdb
+      database: testdb1
       username: userAdmin
       password: password
   main:

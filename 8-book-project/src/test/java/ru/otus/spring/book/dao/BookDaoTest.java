@@ -30,8 +30,8 @@ public class BookDaoTest {
 
     @Test
     public void testInsert() {
-        Author author = new Author(sequenceGeneratorService.generateSequence(Author.SEQUENCE_NAME), "Ivan");
-        Genre genre = new Genre(sequenceGeneratorService.generateSequence(Genre.SEQUENCE_NAME), "Mystic");
+        Author author = new Author("Ivan");
+        Genre genre = new Genre("Mystic");
 
         Book book = new Book(sequenceGeneratorService.generateSequence(Book.SEQUENCE_NAME),"Silent hill", author, genre, new ArrayList<>());
 
@@ -44,8 +44,8 @@ public class BookDaoTest {
 
     @Test
     public void testUpdate() {
-        Author author = new Author(sequenceGeneratorService.generateSequence(Author.SEQUENCE_NAME), "Vasily");
-        Genre genre = new Genre(sequenceGeneratorService.generateSequence(Genre.SEQUENCE_NAME), "Comedy");
+        Author author = new Author("Vasily");
+        Genre genre = new Genre("Comedy");
 
         Book book = new Book(sequenceGeneratorService.generateSequence(Book.SEQUENCE_NAME), "Silent holl2", author, genre, new ArrayList<>());
 
@@ -66,8 +66,8 @@ public class BookDaoTest {
 
     @Test
     public void testDelete() {
-        Author author = new Author(sequenceGeneratorService.generateSequence(Author.SEQUENCE_NAME), "Vasily Ivanov");
-        Genre genre = new Genre(sequenceGeneratorService.generateSequence(Genre.SEQUENCE_NAME), "Comedy for students");
+        Author author = new Author("Vasily Ivanov");
+        Genre genre = new Genre("Comedy for students");
 
         Book book = new Book(sequenceGeneratorService.generateSequence(Book.SEQUENCE_NAME), "Once a time in Paris", author, genre, new ArrayList<>());
 
@@ -86,8 +86,8 @@ public class BookDaoTest {
 
     @Test
     public void testGetById() {
-        Author author = new Author(sequenceGeneratorService.generateSequence(Author.SEQUENCE_NAME), "Vasily Ivanov");
-        Genre genre = new Genre(sequenceGeneratorService.generateSequence(Genre.SEQUENCE_NAME), "Comedy for students");
+        Author author = new Author("Vasily Ivanov");
+        Genre genre = new Genre("Comedy for students");
 
         Book book = new Book(sequenceGeneratorService.generateSequence(Book.SEQUENCE_NAME), "Once a time in Paris", author, genre, new ArrayList<>());
 
@@ -103,8 +103,8 @@ public class BookDaoTest {
     @DisplayName("должен загружать список всех книг с полной информацией о них")
     @Test
     void shouldReturnCorrectStudentsListWithAllInfo() {
-        Author author = new Author(sequenceGeneratorService.generateSequence(Author.SEQUENCE_NAME), "Vasily Ivanov");
-        Genre genre = new Genre(sequenceGeneratorService.generateSequence(Genre.SEQUENCE_NAME), "Comedy for students");
+        Author author = new Author("Vasily Ivanov");
+        Genre genre = new Genre("Comedy for students");
 
         Book book1 = new Book(sequenceGeneratorService.generateSequence(Book.SEQUENCE_NAME), "New book. Tom 1", author, genre, new ArrayList<>());
         Book book2 = new Book(sequenceGeneratorService.generateSequence(Book.SEQUENCE_NAME), "New book. Tom 2", author, genre, new ArrayList<>());
@@ -116,12 +116,12 @@ public class BookDaoTest {
         book2.setComments(new ArrayList<>());
 
         Stream.of(1,2,3,4,5).forEach(i -> {
-            Comment c = new Comment("Comment for book1 " + i, book1);
+            Comment c = new Comment("Comment for book1 " + i);
             book1.getComments().add(c);
         });
 
         Stream.of(1,2,3,4,5).forEach(i -> {
-            Comment c = new Comment("Comment for book2 " + i, book2);
+            Comment c = new Comment("Comment for book2 " + i);
             book2.getComments().add(c);
         });
 
