@@ -6,13 +6,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import ru.otus.spring.book.domain.Author;
-import ru.otus.spring.book.services.AuthorService;
 
 @Controller
 @RequiredArgsConstructor
 public class AuthorPageController {
-
-    private final AuthorService service;
 
     @GetMapping("/author/add")
     public String addAuthorGet(Model model) {
@@ -22,7 +19,6 @@ public class AuthorPageController {
 
     @PostMapping("/author/add")
     public String addAuthorPost(Author author) {
-        service.insert(author);
         return "redirect:/";
     }
 }

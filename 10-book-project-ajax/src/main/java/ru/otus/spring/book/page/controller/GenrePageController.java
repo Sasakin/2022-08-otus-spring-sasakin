@@ -12,8 +12,6 @@ import ru.otus.spring.book.services.GenreService;
 @RequiredArgsConstructor
 public class GenrePageController {
 
-    private final GenreService service;
-
     @GetMapping("/genre/add")
     public String addGenreGet(Model model) {
         model.addAttribute("genre", new Genre());
@@ -22,7 +20,6 @@ public class GenrePageController {
 
     @PostMapping("/genre/add")
     public String addGenrePost(Genre genre) {
-        service.insert(genre);
         return "redirect:/";
     }
 }
