@@ -64,6 +64,18 @@
 
     $(function () {
 
+        $.get('/api/author/list').done(function (authors) {
+            for (var index = 0; index < authors.length; index++) {
+                $('#author-input').append('<option value="' + authors[index].name + '">' + authors[index].name + '</option>');
+            }
+        });
+
+        $.get('/api/genre/list').done(function (genres) {
+            for (var index = 0; index < genres.length; index++) {
+                $('#genre-input').append('<option value="' + genres[index].title + '">' + genres[index].title + '</option>');
+            }
+        });
+
         $.get('/api/book/add').done(function (addBookDataResponse) {
             const authors = addBookDataResponse.authors;
             const genres = addBookDataResponse.genres;

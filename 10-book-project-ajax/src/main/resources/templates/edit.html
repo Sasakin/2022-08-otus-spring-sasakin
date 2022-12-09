@@ -66,24 +66,27 @@
     };
 
     $(function () {
-        const id = [[${id}]];
-        $.get('/api/book/edit', {id: id}).done(function (editBookDataResponse) {
-            var book = editBookDataResponse.book
-            CACHE.book = book;
-            var authors = editBookDataResponse.authors
-            var genres = editBookDataResponse.genres
-            $("#title-input").val(book.title).change();
 
+        $.get('/api/author/list').done(function (authors) {
             for (var index = 0; index < authors.length; index++) {
                 $('#author-input').append('<option value="' + authors[index].name + '">' + authors[index].name + '</option>');
             }
-            $("#author-input").val(book.author.name).change();
+        });
 
+        $.get('/api/genre/list').done(function (genres) {
             for (var index = 0; index < genres.length; index++) {
                 $('#genre-input').append('<option value="' + genres[index].title + '">' + genres[index].title + '</option>');
             }
+        });
+
+        const id = [[${id}]];
+        $.get('/api/book/', {bookId: id}).done(function (book) {
+            CACHE.book = book;
+            $("#title-input").val(book.title).change();
+            $("#author-input").val(book.author.name).change();
             $('#genre-input').val(book.genre.title).change();
         });
+
         $('#save').click(function () {
             CACHE.book.title = $("#title-input").val()
             CACHE.book.author.id = null
