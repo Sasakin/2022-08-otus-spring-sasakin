@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Add new book</title>
+    <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+    <link th:rel="stylesheet" th:href="@{../webjars/bootstrap/4.3.1/css/bootstrap.min.css}">
+</head>
+<body>
+
+<div class="container-fluid" style="max-width: 500px; margin: 0 auto">
+    <div><h2 class="text-center">Edit book</h2></div>
+    <div>
+        <div class="border border-secondary rounded p-3">
+            <div class="form-group row">
+                <label class="col-sm-4 col-form-label">Title:</label>
+                <div class="col-sm-8">
+                    <input id="title-input" type="text" class="form-control" required minlength="3" maxlength="100">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="author-input" class="col-sm-4 col-form-label">Author:</label>
+                <select class="form-control col-sm-8" id="author-input" name="author-input">
+                    <option></option>
+                </select>
+                <a href="/author/add" class="h4">Add new author</a>
+            </div>
+
+            <div class="form-group row">
+                <label for="genre-input" class="col-sm-4 col-form-label">Genre:</label>
+                <select class="form-control col-sm-8" id="genre-input">
+                    <option></option>
+                </select>
+                <a href="/genre/add" class="h4">Add new genre</a>
+            </div>
+            <div class="text-center">
+                <button id="save" type="submit" class="btn btn-primary m-2">Save</button>
+                <a href="/">
+                    <button type="button" class="btn btn-secondary m-2">Cancel</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    jQuery["postJSON"] = function (url, data, callback) {
+        // shift arguments if data argument was omitted
+        if (jQuery.isFunction(data)) {
+            callback = data;
+            data = undefined;
+        }
+
+        return jQuery.ajax({
+            url: url,
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: data,
+            complete: callback
+        });
+    };
+
+    $(function () {
+
+        $.get('/api/author/list').done(function (authors) {
+            for (var index = 0; index < authors.length; index++) {
+                $('#author-input').append('<option value="' + authors[index].name + '">' + authors[index].name + '</option>');
+            }
+        });
+
+        $.get('/api/genre/list').done(function (genres) {
+            for (var index = 0; index < genres.length; index++) {
+                $('#genre-input').append('<option value="' + genres[index].title + '">' + genres[index].title + '</option>');
+            }
+        });
+
+        $.get('/api/book/add').done(function (addBookDataResponse) {
+            const authors = addBookDataResponse.authors;
+            const genres = addBookDataResponse.genres;
+
+            for (var index = 0; index < authors.length; index++) {
+                $('#author-input').append('<option value="' + authors[index].name + '">' + authors[index].name + '</option>');
+            }
+
+            for (var index = 0; index < genres.length; index++) {
+                $('#genre-input').append('<option value="' + genres[index].title + '">' + genres[index].title + '</option>');
+            }
+        });
+
+
+        $('#save').click(function () {
+            const title = $("#title-input").val()
+            const author = new Object()
+            const genre = new Object()
+            author.name = $("#author-input").val()
+            genre.title = $("#genre-input").val()
+            const bookDto = {title, author, genre};
+            $.postJSON("/api/book/save", JSON.stringify(bookDto), function () {
+                window.location.href="../"
+            })
+        });
+    });
+</script>
+
+</body>
+</html>
