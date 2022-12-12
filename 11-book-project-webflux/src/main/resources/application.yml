@@ -6,8 +6,6 @@ spring:
       database: testdb
       username: userAdmin
       password: password
-  main:
-    allow-circular-references: true
 
 
 mongock:
@@ -22,4 +20,10 @@ mongock:
 
 logging:
   level:
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: DEBUG
     ROOT: ERROR

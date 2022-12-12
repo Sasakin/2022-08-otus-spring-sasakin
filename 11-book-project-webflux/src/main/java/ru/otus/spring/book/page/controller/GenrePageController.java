@@ -6,7 +6,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import ru.otus.spring.book.domain.Genre;
-import ru.otus.spring.book.services.GenreService;
 
 @Controller
 @RequiredArgsConstructor

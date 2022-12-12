@@ -17,10 +17,6 @@ import ru.otus.spring.book.rest.controller.BookController;
 import ru.otus.spring.book.rest.controller.dto.AuthorDto;
 import ru.otus.spring.book.rest.controller.dto.BookDto;
 import ru.otus.spring.book.rest.controller.dto.GenreDto;
-import ru.otus.spring.book.rest.controller.response.EditBookDataResponse;
-import ru.otus.spring.book.services.AuthorServiceImpl;
-import ru.otus.spring.book.services.BookServiceImpl;
-import ru.otus.spring.book.services.GenreServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +29,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BookController.class)
-@Import({BookServiceImpl.class, AuthorServiceImpl.class, GenreServiceImpl.class})
 class BookControllerTest {
 
-    @Autowired
+    /*@Autowired
     private MockMvc mvc;
 
     @MockBean
@@ -117,6 +112,6 @@ class BookControllerTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
+    }*/
 
 }

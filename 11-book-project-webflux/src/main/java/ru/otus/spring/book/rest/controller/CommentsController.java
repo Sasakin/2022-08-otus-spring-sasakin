@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.otus.spring.book.dao.BookDao;
 import ru.otus.spring.book.domain.Book;
 import ru.otus.spring.book.domain.Comment;
 import ru.otus.spring.book.rest.controller.dto.CommentDto;
 import ru.otus.spring.book.rest.controller.wrapper.CommentWrapper;
-import ru.otus.spring.book.services.BookService;
-import ru.otus.spring.book.services.CommentsService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,16 +25,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CommentsController {
 
-    private final BookService bookService;
-
-    private final CommentsService commentsService;
+    private final BookDao bookService;
 
     @GetMapping("/list")
     public List<CommentDto> commentList(@RequestParam("id") long id) {
-        Optional<Book> bookOpt = bookService.getById(id);
+        Optional<Book> bookOpt = Optional.empty();// bookService.getById(id);
 
         if(bookOpt.isPresent()) {
-            List<Comment> comments = commentsService.getCommentsByBook(bookOpt.get());
+            List<Comment> comments = new ArrayList<>();// commentsService.getCommentsByBook(bookOpt.get());
             return comments.stream()
                     .map(comment -> CommentDto.toDto(comment))
                     .collect(Collectors.toList());
@@ -44,12 +42,12 @@ public class CommentsController {
 
     @PostMapping("/save")
     public ResponseEntity<Void> saveComment(@RequestBody CommentWrapper commentWrapper) {
-        Optional<Book> bookOpt = bookService.getById(commentWrapper.getBookId());
+        Optional<Book> bookOpt = Optional.empty();// bookService.getById(commentWrapper.getBookId());
         if(bookOpt.isPresent()) {
             Book book = bookOpt.get();
             Comment comment = new Comment(commentWrapper.getText());
             book.getComments().add(comment);
-            bookService.save(book);
+            //bookService.save(book);
             return new ResponseEntity<Void>(HttpStatus.OK);
         }
         return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
@@ -57,13 +55,13 @@ public class CommentsController {
 
     @PostMapping("/comment/delete")
     public String deleteComment(@RequestParam("bookId") long bookId, String commentText) {
-        Book book = bookService.getById(bookId).orElse(null);
+        Book book = new Book();// bookService.getById(bookId).orElse(null);
         if(book != null) {
             Comment comment = book.getComments().stream()
                     .filter(cmt -> cmt.getText().equals(commentText))
                     .findFirst().get();
             book.getComments().remove(comment);
-            bookService.save(book);
+            //bookService.save(book);
         }
         return "redirect:/comment/list?id=" + bookId;
     }

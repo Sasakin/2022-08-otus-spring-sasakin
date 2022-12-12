@@ -1,17 +1,16 @@
 package ru.otus.spring.book.services;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.otus.spring.book.domain.Book;
-
-import java.util.List;
-import java.util.Optional;
 
 public interface BookService {
 
     void save(Book book);
 
-    Optional<Book> getById(long id);
+    Mono<Book> getById(long id);
 
-    List<Book> getAll();
+    Flux<Book> getAll();
 
     void deleteById(long id);
 }

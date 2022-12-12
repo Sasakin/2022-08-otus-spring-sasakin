@@ -1,9 +1,10 @@
 package ru.otus.spring.book.dao;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import reactor.core.publisher.Mono;
 import ru.otus.spring.book.domain.Author;
 
-public interface AuthorDao extends MongoRepository<Author, Long> {
+public interface AuthorDao extends ReactiveMongoRepository<Author, Long> {
 
-    Author getByName(String name);
+    Mono<Author> getByName(String name);
 }
