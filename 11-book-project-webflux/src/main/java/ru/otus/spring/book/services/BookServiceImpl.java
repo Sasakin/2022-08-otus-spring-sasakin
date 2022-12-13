@@ -1,26 +1,19 @@
 package ru.otus.spring.book.services;
 
 import lombok.AllArgsConstructor;
-import org.reactivestreams.Subscription;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.MonoSink;
-import reactor.core.publisher.Signal;
-import reactor.core.publisher.SignalType;
-import reactor.util.context.ContextView;
 import ru.otus.spring.book.dao.AuthorDao;
 import ru.otus.spring.book.dao.BookDao;
 import ru.otus.spring.book.dao.GenreDao;
 import ru.otus.spring.book.domain.Author;
 import ru.otus.spring.book.domain.Book;
 import ru.otus.spring.book.domain.Genre;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.Flow;
-import java.util.function.Consumer;
+import ru.otus.spring.book.rest.controller.dto.AuthorDto;
+import ru.otus.spring.book.rest.controller.dto.BookDto;
+import ru.otus.spring.book.rest.controller.dto.GenreDto;
 
 @Service
 @AllArgsConstructor
@@ -28,7 +21,7 @@ public class BookServiceImpl implements BookService {
 
     private SequenceGeneratorService sequenceGeneratorService;
 
-    private BookDao dao;
+    private BookDao bookDao;
 
     private AuthorDao authorDao;
 
@@ -36,61 +29,129 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
-    public void save(Book book) {
+    public Mono<Book> save(BookDto bookDto) {
+        Author author = AuthorDto.toAuthor(bookDto.getAuthor());
+        Genre genre = GenreDto.toGenre(bookDto.getGenre());
+        final Book book = BookDto.toBook(bookDto, author, genre);
 
-        /*Mono.just(book)
-                .doOnNext(book1 -> {
-                    if (book1.getAuthor().getId() == null) {
-                        Author ifEmpty = book.getAuthor();
-                        bookAuthor = authorDao.getByName(book.getAuthor().getName())
-                                .defaultIfEmpty(ifEmpty);
-                    }
-                })
-
-        // Заполняем данные об авторе и жанре из БД
-        Mono<Author> bookAuthor = Mono.just(book.getAuthor());
-
-        if (book.getAuthor().getId() == null) {
-            Author ifEmpty = book.getAuthor();
-            ifEmpty.setId(sequenceGeneratorService.generateSequence(Author.SEQUENCE_NAME));
-            bookAuthor = authorDao.getByName(book.getAuthor().getName())
-                    .defaultIfEmpty(ifEmpty);
+        if (book.getId() != null) {
+            return buildSaveMonoBookWithoutId(book, author.getName(), genre.getTitle());
         }
 
-        book.setAuthor(bookAuthor.);
-
-        Genre bookGenre = Optional.of(book.getGenre()).map(genre -> {
-            if (genre.getId() == null) {
-                Genre genreByTitle = genreDao.getByTitle(genre.getTitle());
-                if (genreByTitle != null) {
-                    return genreByTitle;
-                }
-            }
-            return genre;
-        }).get();
-
-        book.setGenre(bookGenre);*/
-
-        dao.save(book);
+        return buildSaveMonoBook(book, author.getName(), genre.getTitle());
     }
 
     @Override
-    public Mono<Book> getById(long id) {
-        return dao.findById(id);
-    }
-
-    @Override
-    public Flux<Book> getAll() {
-        return dao.findAll();
-    }
-
-    @Override
-    public void deleteById(long id) {
-        Mono<Book> bookOpt = getById(id);
-        bookOpt.hasElement().doOnNext(hasElement -> {
-            if(hasElement) {
-                dao.deleteById(id);
-            }
+    public Mono<BookDto> getById(long id) {
+        return bookDao.findById(id).map(book -> {
+            AuthorDto authorDto = AuthorDto.toDto(book.getAuthor());
+            GenreDto genreDto = GenreDto.toDto(book.getGenre());
+            BookDto bookDto = BookDto.toDto(book, authorDto, genreDto);
+            return bookDto;
         });
+    }
+
+    @Override
+    public Flux<BookDto> getAll() {
+        return bookDao.findAll().flatMap(book -> {
+            return Mono.zip(authorDao.findById(book.getAuthorId()),
+                            Mono.just(book),
+                            ((author, book1) -> {
+                                book1.setAuthor(author);
+                                return book1;
+                            }))
+                    .zipWith(genreDao.findById(book.getGenreId()),
+                            (book1, genre1) -> {
+                                book1.setGenre(genre1);
+                                return book1;
+                            });
+        }).map(book -> {
+            AuthorDto authorDto = AuthorDto.toDto(book.getAuthor());
+            GenreDto genreDto = GenreDto.toDto(book.getGenre());
+            BookDto bookDto = BookDto.toDto(book, authorDto, genreDto);
+            return bookDto;
+        });
+    }
+
+    @Override
+    public Flux<BookDto> searchByKeyWord(String keyword) {
+        return bookDao.findAll()
+                .filter(book -> book.getTitle() != null
+                        && book.getTitle().toLowerCase().contains(keyword.toLowerCase()))
+                .map(book -> {
+                    AuthorDto authorDto = AuthorDto.toDto(book.getAuthor());
+                    GenreDto genreDto = GenreDto.toDto(book.getGenre());
+                    BookDto bookDto = BookDto.toDto(book, authorDto, genreDto);
+                    return bookDto;
+                }).limitRate(15);
+    }
+
+    private Mono<Book> buildSaveMonoBook(Book book, String authorName, String genreTitle) {
+        Mono<Book> beforeSave = buildMonoBookAuthorAndGenre(book, authorName, genreTitle)
+                .zipWith(sequenceGeneratorService.generateSequence(Author.SEQUENCE_NAME),
+                        (book1, id) -> {
+                            book1.setId(id);
+                            return book1;
+                        });
+        return buildMonoSaveFunction(beforeSave);
+    }
+
+    private Mono<Book> buildSaveMonoBookWithoutId(Book book, String authorName, String genreTitle) {
+        Mono<Book> beforeSave = buildMonoBookAuthorAndGenre(book, authorName, genreTitle);
+        return buildMonoSaveFunction(beforeSave);
+    }
+
+    private Mono<Book> buildMonoSaveFunction(Mono<Book> beforeSave) {
+        return beforeSave.flatMap(book -> bookDao.save(book));
+    }
+
+    private Mono<Book> buildMonoBookAuthorAndGenre(Book book, String authorName, String genreTitle) {
+        return Mono.zip(getAuthorOrSave(authorName),
+                        Mono.just(book),
+                        ((author, book1) -> {
+                            book1.setAuthor(author);
+                            return book1;
+                        }))
+                .zipWith(getGenreOrSave(genreTitle),
+                        (book1, genre1) -> {
+                            book1.setGenre(genre1);
+                            return book1;
+                        });
+    }
+
+    /**
+     * Проверить наличие автора в БД
+     *
+     * @param name - имя автора
+     * @return
+     */
+    public Mono<Author> getAuthorOrSave(String name) {
+        return authorDao.getByName(name)
+                .switchIfEmpty(Mono.zip(Mono.just(name),
+                                sequenceGeneratorService.generateSequence(Author.SEQUENCE_NAME),
+                                (authorName, id) -> new Author(id, name))
+                        .delayUntil(author -> authorDao.save(author)))
+                .single();
+    }
+
+    /**
+     * Проверить наличие жанра в БД
+     *
+     * @param title - имя жанра
+     * @return
+     */
+    public Mono<Genre> getGenreOrSave(String title) {
+        return genreDao.getByTitle(title)
+                .switchIfEmpty(Mono.zip(Mono.just(title),
+                                sequenceGeneratorService.generateSequence(Genre.SEQUENCE_NAME),
+                                (genreTitle, id) -> new Genre(id, genreTitle))
+                        .delayUntil(genre -> genreDao.save(genre)))
+                .single();
+    }
+
+    @Override
+    @Transactional
+    public Mono<Void> deleteById(long id) {
+        return bookDao.deleteById(id);
     }
 }

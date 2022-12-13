@@ -3,14 +3,17 @@ package ru.otus.spring.book.services;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.otus.spring.book.domain.Book;
+import ru.otus.spring.book.rest.controller.dto.BookDto;
 
 public interface BookService {
 
-    void save(Book book);
+    Mono<Book> save(BookDto book);
 
-    Mono<Book> getById(long id);
+    Mono<BookDto> getById(long id);
 
-    Flux<Book> getAll();
+    Flux<BookDto> getAll();
 
-    void deleteById(long id);
+    Flux<BookDto> searchByKeyWord(String keyword);
+
+    Mono<Void> deleteById(long id);
 }

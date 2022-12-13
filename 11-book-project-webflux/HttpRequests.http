@@ -23,13 +23,13 @@ Content-Type: application/json
 
 {
   "id": "",
-  "title": "The Gun",
+  "title": "The Gun1",
   "author": {
     "id": "",
-    "name": "Victor"
+    "name": "Victor1"
   },
   "genre": {
     "id": "",
-    "title": "Western"
+    "title": "Western1"
   }
 }
