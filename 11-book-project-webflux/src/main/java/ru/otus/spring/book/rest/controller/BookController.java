@@ -1,6 +1,10 @@
 package ru.otus.spring.book.rest.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.mongodb.core.ReactiveMongoOperations;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +28,8 @@ import ru.otus.spring.book.rest.controller.dto.BookDto;
 import ru.otus.spring.book.rest.controller.dto.GenreDto;
 import ru.otus.spring.book.services.SequenceGeneratorService;
 
+import java.util.HashSet;
+
 @RestController()
 @RequiredArgsConstructor
 public class BookController {
@@ -36,7 +42,7 @@ public class BookController {
 
     @GetMapping(value = {"/api/book/list"}, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<BookDto> listPage() {
-        Flux<BookDto> books = bookDao.findAll().map(book -> {
+        Flux<BookDto> books = mongoOperations.findAll(Book.class).map(book -> {
             AuthorDto authorDto = AuthorDto.toDto(book.getAuthor());
             GenreDto genreDto = GenreDto.toDto(book.getGenre());
             BookDto bookDto = BookDto.toDto(book, authorDto, genreDto);
@@ -78,53 +84,97 @@ public class BookController {
         Genre genre = GenreDto.toGenre(bookDto.getGenre());
         final Book book = BookDto.toBook(bookDto, author, genre);
 
-        if (bookDto.getId() == null) {
-            Mono<Book> bookMono = genereateBookDataForSave(author, genre, book);
-
-            Mono<Book> resultBookMono =
-                    Mono.zip(sequenceGeneratorService.generateSequence(Book.SEQUENCE_NAME),
-                    bookMono,
-                    (id, book1) -> {
-                        book1.setId(id);
-                        return book;
-                    });
-            return resultBookMono;//.map(bMono -> new ResponseEntity<>(HttpStatus.OK));
-
+        if(book.getId() != null) {
+            return buildSaveMonoBookWithoutId(book, author.getName(), genre.getTitle());
         }
 
-        Mono<Book> bookMono = genereateBookDataForSave(author, genre, book);
-
-        return bookMono;//.map(bMono -> new ResponseEntity<>(HttpStatus.OK));
+        return buildSaveMonoBook(book, author.getName(), genre.getTitle());
     }
 
-    private Mono<Book> genereateBookDataForSave(Author author, Genre genre, Book book) {
-        return Mono.zip(author.getId() == null ?
-                        Mono.zip(authorDao.getByName(author.getName()),
+    private final ReactiveMongoOperations mongoOperations;
+
+    private Mono<Book> buildSaveMonoBook(Book book, String authorName, String genreTitle) {
+        return buildMonoBookAuthorAndGenre(book, authorName, genreTitle)
+                .zipWith(sequenceGeneratorService.generateSequence(Author.SEQUENCE_NAME),
+                        (book1, id) -> {
+                            book1.setId(id);
+                            return book1;
+                        })
+                .delayUntil(book1 -> mongoOperations.save(book1));
+                //.doOnNext(book1 -> bookDao.save(book1));
+                /*.doOnNext(book1 -> Mono.zip(Mono.just(book1),
+                            Mono.just(book1).doOnNext(book2 -> {
+                                Author author = book2.getAuthor();
+                                if(author.getBooks() == null) {
+                                    author.setBooks(new HashSet<>());
+                                }
+                                author.getBooks().add(book2);
+                            }),
+                            (book2, autor) -> book2))
+                .doOnNext(book1 -> Mono.zip(Mono.just(book1),
+                        mongoOperations.update(Genre.class)
+                                .matching(Criteria.where("id").is(book1.getGenre().getId()))
+                                .apply(new Update().push("books", book1)).findAndModify(),
+                        (book2, genre) -> book2));*/
+    }
+
+    private Mono<Book> buildSaveMonoBookWithoutId(Book book, String authorName, String genreTitle) {
+        return buildMonoBookAuthorAndGenre(book, authorName, genreTitle)
+                .delayUntil(book1 -> mongoOperations.save(book1));
+                /*.doOnNext(book1 -> Mono.zip(Mono.just(book1),
+                        mongoOperations.update(Author.class)
+                                .matching(Criteria.where("id").is(book1.getAuthor().getId()))
+                                .apply(new Update().push("books", book1)).findAndModify(),
+                        (book2, autor) -> book2))
+                .doOnNext(book1 -> Mono.zip(Mono.just(book1),
+                        mongoOperations.update(Genre.class)
+                                .matching(Criteria.where("id").is(book1.getGenre().getId()))
+                                .apply(new Update().push("books", book1)).findAndModify(),
+                        (book2, genre) -> book2));*/
+    }
+
+    private Mono<Book> buildMonoBookAuthorAndGenre(Book book, String authorName, String genreTitle) {
+        return Mono.zip(getAuthor(authorName),
+                        Mono.just(book),
+                        ((author, book1) -> {
+                            book1.setAuthor(author);
+                            return book1;
+                        }))
+                .zipWith(getGenre(genreTitle),
+                        (book1, genre1) -> {
+                            book1.setGenre(genre1);
+                            return book1;
+                        });
+    }
+
+    /**
+     * Проверить наличие автора в БД
+     * @param name - имя автора
+     * @return
+     */
+    public Mono<Author> getAuthor(String name) {
+        return mongoOperations
+                .find(Query.query(Criteria.where("name").is(name)), Author.class)
+                .switchIfEmpty(Mono.zip(Mono.just(name),
                                 sequenceGeneratorService.generateSequence(Author.SEQUENCE_NAME),
-                                (author1, id) -> {
-                                    if(author1 == null) {
-                                        author.setId(id);
-                                        return author;
-                                    }
-                                    return author1;
-                                }) :
-                        Mono.just(author),
-                genre.getId() == null ?
-                        Mono.zip(genreDao.getByTitle(genre.getTitle()),
+                                (authorName, id) -> new Author(id, name))
+                        .delayUntil(author -> mongoOperations.save(author)))
+                .single();
+    }
+
+    /**
+     * Проверить наличие жанра в БД
+     * @param title - имя жанра
+     * @return
+     */
+    public Mono<Genre> getGenre(String title) {
+        return mongoOperations
+                .find(Query.query(Criteria.where("title").is(title)), Genre.class)
+                .switchIfEmpty(Mono.zip(Mono.just(title),
                                 sequenceGeneratorService.generateSequence(Genre.SEQUENCE_NAME),
-                                (genre1, id) -> {
-                                    if(genre1 == null) {
-                                        genre.setId(id);
-                                        return genre;
-                                    }
-                                    return genre1;
-                                }) :
-                        Mono.just(genre),
-                (author1, genre1) -> {
-                    book.setAuthor(author1);
-                    book.setGenre(genre1);
-                    return book;
-                });
+                                (genreTitle, id) -> new Genre(id, genreTitle))
+                        .delayUntil(genre -> mongoOperations.save(genre)))
+                .single();
     }
 
     @GetMapping("/api/book/delete")
