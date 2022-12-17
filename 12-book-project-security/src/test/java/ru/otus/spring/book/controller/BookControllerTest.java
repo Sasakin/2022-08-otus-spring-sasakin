@@ -17,9 +17,7 @@ import ru.otus.spring.book.rest.controller.BookController;
 import ru.otus.spring.book.rest.controller.dto.AuthorDto;
 import ru.otus.spring.book.rest.controller.dto.BookDto;
 import ru.otus.spring.book.rest.controller.dto.GenreDto;
-import ru.otus.spring.book.services.AuthorServiceImpl;
 import ru.otus.spring.book.services.BookServiceImpl;
-import ru.otus.spring.book.services.GenreServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;

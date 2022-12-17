@@ -8,13 +8,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ru.otus.spring.book.domain.Author;
 import ru.otus.spring.book.domain.Book;
 import ru.otus.spring.book.domain.Genre;
-import ru.otus.spring.book.services.BookService;
 
 @Controller
 @AllArgsConstructor
 public class PageController {
-
-    private BookService bookService;
 
     @GetMapping("/")
     public String listPage() {
@@ -47,8 +44,7 @@ public class PageController {
     }
 
     @GetMapping("/book/delete")
-    public String deleteBook(@RequestParam("id") Long id) {
-        bookService.deleteById(id);
+    public String deleteBook() {
         return "redirect:/";
     }
 
