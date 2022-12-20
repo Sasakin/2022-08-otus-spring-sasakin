@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Главная страница</title>
+</head>
+<body>
+<h2>1. Visit <a th:href="@{public}">public page</a></h2>
+<br>
+<h2>2. Visit <a th:href="@{list}">book list (Spring Security protected, Need User Role)</a></h2>
+<br>
+<h2>3. Visit <a th:href="@{login}">login page</a></h2>
+<br>
+<h2>4. Visit <a th:href="@{admin}">Admin page (Spring Security protected, Need Admin Role)</a></h2>
+</body>
+</html>
