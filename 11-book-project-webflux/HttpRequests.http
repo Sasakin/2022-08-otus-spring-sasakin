@@ -1,0 +1,35 @@
+###
+GET http://localhost:8080/api/book/list
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+###
+GET http://localhost:8080/api/book/search?keyword=On
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+###
+GET http://localhost:8080/api/book?bookId=1
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+###
+POST http://localhost:8080/api/book/save
+Accept: application/json
+Content-Type: application/json
+
+{
+  "id": "",
+  "title": "The Gun1",
+  "author": {
+    "id": "",
+    "name": "Victor1"
+  },
+  "genre": {
+    "id": "",
+    "title": "Western1"
+  }
+}

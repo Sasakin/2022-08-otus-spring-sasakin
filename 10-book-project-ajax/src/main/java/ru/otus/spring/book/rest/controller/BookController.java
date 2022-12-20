@@ -17,6 +17,7 @@ import ru.otus.spring.book.rest.controller.dto.BookDto;
 import ru.otus.spring.book.rest.controller.dto.GenreDto;
 import ru.otus.spring.book.services.BookService;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
