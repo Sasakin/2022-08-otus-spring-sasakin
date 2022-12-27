@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/test1
+    username: postgres
+    password: postgres
+    initialization-mode: never
+  sql:
+    init:
+      mode: always
+      data-locations: data.sql
+      schema-locations: schema.sql
+  main:
+    allow-circular-references: true
+
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: none
+
+    properties:
+      hibernate:
+        format_sql: true
+
+    show-sql: true
+
+logging:
+ level:
+   ROOT: ERROR

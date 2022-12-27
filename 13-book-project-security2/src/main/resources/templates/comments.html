@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>List of comments</title>
+    <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" th:href="@{../webjars/bootstrap/css/bootstrap.min.css}">
+
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="text-center"><h3 class="text-center">Comments:</h3></div>
+
+    <div class="text-center">
+        <a th:href="@{/comment/add(bookId=${id})}">Add new comment</a>
+    </div>
+    <table class="table table-bordered">
+        <thead class="thead-dark">
+        <tr>
+            <th>ID</th>
+            <th>Text</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    $(function () {
+        const id = [[${id}]];
+        $.get('/api/comment/list', {id: id}).done(function (comments) {
+            comments.forEach(function (comment) {
+                $('tbody').append(`
+                    <tr>
+                        <td>${comment.id}</td>
+                        <td>${comment.text}</td>
+                    </tr>
+                    `)
+            });
+        })
+    });
+</script>
+</body>
+</html>
