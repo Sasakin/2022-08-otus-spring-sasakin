@@ -27,6 +27,8 @@ spring:
 logging:
  level:
    ROOT: ERROR
+ file:
+   name: logfile.txt
 
 management:
   endpoints:
