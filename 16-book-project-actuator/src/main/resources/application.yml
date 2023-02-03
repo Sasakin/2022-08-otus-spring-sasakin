@@ -24,8 +24,10 @@ spring:
     show-sql: true
 
 logging:
- level:
-   ROOT: ERROR
+  level:
+   ROOT: INFO
+  file:
+    name: logfile.txt
 
 management:
   endpoints:
