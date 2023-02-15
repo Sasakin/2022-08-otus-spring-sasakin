@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.otus.spring.book.domain.Author;
+import ru.otus.spring.book.hystrix.services.HystrixAuthorService;
 import ru.otus.spring.book.rest.controller.dto.AuthorDto;
 import ru.otus.spring.book.services.AuthorService;
 
@@ -14,11 +15,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AuthorController {
 
-    private final AuthorService authorService;
+    private final HystrixAuthorService service;
 
     @GetMapping({"/api/author/list"})
     public List<AuthorDto> getAuthors() {
-        List<Author> authors = authorService.getAll();
-        return authors.stream().map(author -> AuthorDto.toDto(author)).collect(Collectors.toList());
+        return service.getAuthors();
     }
 }
