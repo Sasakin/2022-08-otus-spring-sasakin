@@ -1,0 +1,51 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/test1
+    username: postgres
+    password: postgres
+    initialization-mode: never
+  sql:
+    init:
+      mode: always
+      data-locations: data.sql
+      schema-locations: schema.sql
+  jmx:
+    enabled: true
+
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: none
+
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+    show-sql: true
+
+logging:
+ level:
+   ROOT: ERROR
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  health:
+    defaults:
+      enabled: true
+
+
+
+hystrix:
+  command:
+    getBookList:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 3000
